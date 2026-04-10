@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-[#0F172A] grid place-items-center px-4">
+
+  <div class="w-full max-w-md text-center">
+
+    <!-- Logo -->
+    <div class="mb-10">
+      <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
+        <span class="text-pink-400 font-bold text-lg">P</span>
+      </div>
+      <h1 class="text-3xl tracking-widest text-gray-300 font-semibold">
+        PROPIFY
+      </h1>
+    </div>
+
+    <!-- Form -->
+    <form class="flex flex-col gap-6" [formGroup]="loginForm" (ngSubmit)="submitForm()">
+
+      
+      <!-- <div class="relative">
+        <label class="absolute -top-2 left-4 bg-[#0F172A] px-1 text-xs text-blue-400">
+          Email or username
+        </label>
+        <input
+          type="text"
+          placeholder="John@gmail.com"
+          class="w-full rounded-full border border-gray-600 bg-[#1E293B] text-gray-200 px-5 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        />
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-sm">
+          ✓
+        </div>
+      </div> -->
+
+      <app-input-field placeholder="John@gmail.com" label="Email" type="text" formControlName="email"></app-input-field>
+      <app-input-field label="password" placeholder="21234@123" type="password" formControlName=password></app-input-field>
+
+      <!--  Password -->
+    
+
+      <!-- Continue Button -->
+      <button
+        type="submit"
+        class="w-full py-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium text-lg hover:opacity-90 transition duration-300"
+      >
+        Continue
+      </button>
+
+    </form>
+    <div class="w-full flex sm:justify-start justify-center ">
+
+        <button routerLink="/reg-step-1" class="text-white hover:text-blue-400 underline py-3 text-lg text-start ">Don't Have Account Register</button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,53 @@
+ <div class="grid min-h-screen place-items-center bg-[#0F172A] px-4">
+    <!-- Card Container -->
+    <div class="w-full max-w-md">
+      <!-- Logo -->
+      <div class="mb-8 text-center">
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-pink-400/20">
+          <span class="text-lg font-bold text-pink-400">P</span>
+        </div>
+        <h1 class="text-3xl font-semibold tracking-widest text-gray-300">PROPIFY</h1>
+      </div>
+
+      <!-- Heading -->
+      <div class="mb-8 flex items-center justify-center gap-2 text-gray-300">
+        <h2 class="text-lg sm:text-xl">Welcome to Propify</h2>
+        <span class="font-semibold text-gray-600">1</span>
+        <span class="text-gray-400">of 4</span>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="regStep1Form" (ngSubmit)="submitForm()" class="flex flex-col gap-6">
+       
+
+        <app-input-field formControlName="email" label="Email" placeholder="John@gmail.com" type="text" [isSubmitted]="isSubmitted"></app-input-field>
+       
+
+        <app-input-field formControlName="full_name" label="Full Name" placeholder="john smith" type="text"  [isSubmitted]="isSubmitted"></app-input-field>
+
+        <!-- Username (Error State) -->
+        
+        <app-input-field formControlName="username" label="Username" placeholder="john1122" type="text"  [isSubmitted]="isSubmitted"></app-input-field>
+
+
+        <!-- Button -->
+        <!-- <button type="submit"  class="mt-2 w-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 text-lg 
+        font-medium text-white transition duration-300 hover:opacity-90">Continue</button> -->
+
+      <div class="w-full rounded-full py-3  text-white bg-gradient-to-r from-blue-600 to-indigo-600">
+  <p-button
+   
+    [loading]="isLoading()"
+    [disabled]="isLoading()"
+    type="submit"
+    styleClass="w-full bg-transparent flex gap-2 border-none text-lg font-medium hover:opacity-90"
+  >Continue</p-button>
+</div>
+
+      </form>
+      <div class="w-full flex sm:justify-start justify-center ">
+  
+          <button routerLink="/sign-in" class="text-white hover:text-blue-400 underline py-3 text-lg text-start ">Already Have Account</button>
+      </div>
+    </div>
+  </div>

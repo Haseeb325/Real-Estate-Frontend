@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-[#0F172A] grid place-items-center px-4">
+
+  <div class="w-full max-w-md text-center">
+
+    <!-- Logo -->
+    <div class="mb-8">
+      <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
+        <span class="text-pink-400 font-bold text-lg">P</span>
+      </div>
+      <h1 class="text-3xl tracking-widest text-gray-300 font-semibold">
+        PROPIFY
+      </h1>
+    </div>
+
+    <!-- Heading -->
+    <div class="flex items-center justify-center gap-3 mb-10 text-gray-300">
+      <h2 class="text-lg sm:text-xl font-medium">Choose your interest</h2>
+      <span class="font-semibold text-white">4</span>
+      <span class="text-gray-400">of 4</span>
+    </div>
+
+    <!-- Options -->
+<form [formGroup]="finalStepForm" (ngSubmit)="saveUser()">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+    
+    <!-- Buyer -->
+    <label
+      class="relative cursor-pointer rounded-xl border-2 p-6 text-center transition-all hover:border-blue-400"
+      [ngClass]="finalStepForm.get('role')?.value === 'buyer' ? 'border-blue-500 bg-[#1E293B]' : 'border-gray-600 bg-[#1E293B]'">
+      
+      <span *ngIf="finalStepForm.get('role')?.value === 'buyer'"
+            class="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">
+        ✓
+      </span>
+
+      <input type="radio" formControlName="role" value="buyer" class="hidden" />
+
+      <p [ngClass]="finalStepForm.get('role')?.value === 'buyer' ? 'text-white' : 'text-gray-300'"
+         class="font-semibold text-lg">
+        Work as a buyer
+      </p>
+    </label>
+
+    <!-- Seller -->
+    <label
+      class="relative cursor-pointer rounded-xl border p-6 text-center transition-all hover:border-blue-400"
+      [ngClass]="finalStepForm.get('role')?.value === 'seller' ? 'border-blue-500 bg-[#1E293B]' : 'border-gray-600 bg-[#1E293B]'">
+      
+      <span *ngIf="finalStepForm.get('role')?.value === 'seller'"
+            class="absolute top-3 right-3 w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">
+        ✓
+      </span>
+
+      <input type="radio" formControlName="role" value="seller" class="hidden" />
+
+      <p [ngClass]="finalStepForm.get('role')?.value === 'seller' ? 'text-white' : 'text-gray-300'"
+         class="font-semibold text-lg">
+        Work as a seller
+      </p>
+    </label>
+  </div>
+
+   <div class="w-full rounded-full py-3  text-white bg-gradient-to-r from-blue-600 to-indigo-600">
+  <p-button
+   
+    [loading]="isLoading()"
+    [disabled]="isLoading()"
+    type="submit"
+    styleClass="w-full bg-transparent flex gap-2 border-none text-lg font-medium hover:opacity-90"
+  >Finish</p-button>
+</div>
+</form>
+
+@if(showError){
+
+  <p class="text-red-500 py-3">{{showError}}</p>
+}
+
+   
+
+  </div>
+
+</div>

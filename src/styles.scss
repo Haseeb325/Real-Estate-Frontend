@@ -1,1 +1,64 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "primeicons/primeicons.css";
+
+
+.p-toast {
+  width: auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center
+}
+
+.p-toast-message {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+
+  min-width: 320px !important;
+  max-width: 420px !important;
+  padding: 14px 16px !important;
+
+}
+.p-toast-message-content {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+}
+
+.p-toast-summary {
+    margin-left: 12px !important;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.p-toast-detail {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.p-toast-icon-close {
+  color: #6b7280;
+}
+
+
+.p-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+/* Loading spinner spacing */
+.p-button-loading-icon {
+  margin-right: 8px !important;
+}
+
+/* Label spacing */
+.p-button-label {
+  margin-left: 6px !important;
+}

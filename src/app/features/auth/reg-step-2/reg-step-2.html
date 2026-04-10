@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-[#0F172A] grid place-items-center px-4">
+
+  <div class="w-full max-w-md text-center">
+
+    <!-- Logo -->
+    <div class="mb-8">
+      <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
+        <span class="text-pink-400 font-bold text-lg">P</span>
+      </div>
+      <h1 class="text-3xl tracking-widest text-gray-300 font-semibold">
+        PROPIFY
+      </h1>
+    </div>
+
+    <!-- Heading -->
+    <div class="flex items-center justify-center gap-3 mb-8 text-gray-300">
+      <h2 class="text-lg sm:text-xl font-medium">Verify your email</h2>
+      <span class="font-semibold text-white">2</span>
+      <span class="text-gray-400">of 4</span>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="regStep2Form" (ngSubmit)="submitForm()" class="space-y-6">
+
+    
+      <app-input-field formControlName="otp" label="Otp" placeholder="29384" [isSubmitted]="isSubmitted"></app-input-field>
+
+      <!-- Resend Text -->
+      <p class="text-gray-400 space-x-1 text-sm">
+        Didn’t get it ? 
+        <span class="text-gray-300">Resend in</span>
+        <span class="font-semibold text-white">{{formattedTime}}</span>
+      </p>
+      <button (click)="resendOtp()" [disabled]="isResendDisabled"
+       class="font-bold text-center text-white text-lg px-3 py-1 rounded-[16px] bg-gradient-to-r from-blue-600 to-indigo-600">Resend</button>
+
+      <!-- Buttons Row -->
+      <div class="flex items-center justify-between gap-4 pt-4">
+
+        <!-- Back Button -->
+        <button
+          type="button"
+          class="flex items-center justify-center w-14 h-12 rounded-full border border-gray-600 text-gray-300 hover:bg-gray-800 transition"
+        >
+          ←
+        </button>
+
+        <!-- Verify Button -->
+        <button
+          type="submit"
+          class="flex-1 py-3 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-lg hover:opacity-90 transition duration-300"
+        >
+          Verify Email
+        </button>
+
+      </div>
+
+    </form>
+  </div>
+
+</div>

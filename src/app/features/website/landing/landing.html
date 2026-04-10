@@ -1,0 +1,305 @@
+<div class="font-sans bg-[#0f172a] text-slate-100 overflow-x-hidden">
+
+  <!-- <nav class="relative flex items-center justify-between px-4 py-4 md:px-12 bg-[#0f172a] border-b border-slate-800 z-50">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">🤖</div>
+      <span class="font-serif tracking-widest uppercase text-lg text-white">Propify</span>
+    </div>
+
+    <div class="hidden md:flex items-center gap-4">
+      <button class="px-4 py-2 border border-slate-600 text-white rounded-full text-sm font-medium hover:bg-slate-800 transition">Home</button>
+      <button class="px-4 py-2 border border-slate-600 text-white rounded-full text-sm font-medium hover:bg-slate-800 transition">Sign in</button>
+      <button class="px-6 py-2 border border-slate-600 text-white rounded-full text-sm font-medium hover:bg-slate-800 transition">Register</button>
+    </div>
+
+    <button id="mobile-menu-btn" class="md:hidden text-white p-2 focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+
+    <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-[#0f172a] border-b border-slate-800 p-4 flex-col gap-4 shadow-xl md:hidden">
+      <button class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition">Home</button>
+      <button class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition">Sign in</button>
+      <button class="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Register</button>
+    </div>
+  </nav> -->
+
+  <header class="relative flex flex-col items-center">
+    <div class="relative w-full h-[400px] md:h-[600px] flex items-center justify-center">
+      <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=2000" 
+             class="w-full h-full object-cover brightness-[0.3]" alt="House">
+      </div>
+
+      <div class="relative z-10 text-center px-4">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white">Find Your Place Here</h1>
+        <p class="text-lg md:text-xl font-light italic text-slate-300">Discover properties for sale across the country</p>
+      </div>
+    </div>
+
+    <div class="relative w-full px-4 max-w-6xl -mt-20 md:-mt-0 md:absolute md:-bottom-12 z-20">
+      <div class="bg-[#1e293b] rounded-2xl shadow-2xl p-6 md:p-8 space-y-4 border border-slate-700">
+        
+        <!-- Main Filter Row -->
+        <div class="flex flex-col md:flex-row gap-4 items-end">
+          <!-- Property Type Filter -->
+          <div class="w-full md:w-1/6">
+            <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Property Type</label>
+            <select [ngModel]="selectedPropertyType()" 
+            (ngModelChange)="onPropertyTypeChange($event)"
+            class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]">
+              <option value="">All Types</option>
+              <option value="apartment">Apartments</option>
+              <option value="house">Houses</option>
+              <option value="plots_and_land">Land & Plots</option>
+              <option value="commercial">Commercial</option>
+            </select>
+          </div>
+          <div class="w-full md:w-1/6">
+            <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Property Type</label>
+            <select [ngModel]="purchaseType()" 
+            (ngModelChange)="purchaseType.set($event)"
+            class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]">
+              <option value="">All Types</option>
+              <option value="sale">Sell</option>
+              <option value="rent">Rent</option>
+            </select>
+          </div>
+
+          <!-- Min Price Filter -->
+          <div class="w-full md:w-1/6">
+            <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Min Price</label>
+            <select [ngModel]="minPrice()"
+            (ngModelChange)="minPrice.set($event)"
+            class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]">
+              <option value="">Any</option>
+              <option value="0">$0</option>
+              <option value="100000">$100K</option>
+              <option value="500000">$500K</option>
+              <option value="1000000">$1M</option>
+              <option value="5000000">$5M</option>
+            </select>
+          </div>
+
+          <!-- Max Price Filter -->
+          <div class="w-full md:w-1/6">
+            <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Max Price</label>
+            <select [ngModel]="maxPrice()"
+            (ngModelChange)="maxPrice.set($event)"
+            class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]">
+              <option value="">Any</option>
+              <option value="100000">$100K</option>
+              <option value="500000">$500K</option>
+              <option value="1000000">$1M</option>
+              <option value="5000000">$5M</option>
+              <option value="10000000">$10M+</option>
+            </select>
+          </div>
+
+          <!-- Location Filter -->
+          <div class="w-full md:w-1/6">
+            <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Location</label>
+            <select [ngModel]="selectedLocation()"
+            (ngModelChange)="selectedLocation.set($event)"
+            class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]">
+              <option value="">All Locations</option>
+              @for(location of uniqueLocations(); track location) {
+                <option [value]="location">{{ location }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Search Button -->
+          <button (click)="loadProperties(false)" class="w-full md:w-auto px-10 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20 h-[38px]">Search</button>
+
+          <!-- Clear Filters Button -->
+          <button (click)="clearAllFilters()" class="w-full md:w-auto px-6 py-2 bg-slate-700 text-white rounded-lg font-bold hover:bg-slate-600 transition h-[38px] text-sm">Clear</button>
+        </div>
+
+        <!-- Dynamic Filters Row (Shows when any property type is selected) -->
+        @if (selectedPropertyType()) {
+          <div class="flex flex-col md:flex-row gap-4 items-end pt-4 border-t border-slate-700">
+            
+            <!-- Bedrooms Filter -->
+            @if(selectedPropertyType() === 'apartment' || selectedPropertyType() === 'house') {
+              <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Bedrooms</label>
+                <select [ngModel]="selectedBedrooms()" (ngModelChange)="selectedBedrooms.set($event)" 
+                class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">Any</option>
+                    <option [value]="1">1 Bed</option>
+                    <option [value]="2">2 Beds</option>
+                    <option [value]="3">3 Beds</option>
+                    <option [value]="4">4 Beds</option>
+                    <option [value]="5">5 Beds</option>
+                    <option [value]="6">6 Beds</option>
+                </select>
+              </div>
+            }
+
+            <!-- Bathrooms Filter -->
+            @if(selectedPropertyType() === 'apartment' || selectedPropertyType() === 'house') {
+              <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Bathrooms</label>
+                <select [ngModel]="selectedBathrooms()"
+                (ngModelChange)="selectedBathrooms.set($event)"
+                class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">Any</option>
+                    <option [value]="1">1</option>
+                    <option [value]="2">2</option>
+                    <option [value]="3">3</option>
+                    <option [value]="4">4</option>
+                </select>
+              </div>
+            }
+
+            <!-- Furnishing Filter (Apartments) -->
+            @if(selectedPropertyType() === 'apartment' ) {
+              <div class="w-full md:w-1/4">
+                <label class="block text-xs font-bold text-indigo-400 uppercase mb-2">Furnishing</label>
+                <select [ngModel]="selectedFurnishing()" (ngModelChange)="selectedFurnishing.set($event)" 
+                class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <option value="">All</option>
+                  <option value="furnished">Furnished</option>
+                  <option value="semi-furnished">Semi-Furnished</option>
+                  <option value="unfurnished">Unfurnished</option>
+                </select>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 pt-16 md:pt-32 pb-20">
+    <div class="mb-10 text-center md:text-left">
+      <h2 class="text-3xl font-bold text-white">Browse by Category</h2>
+      <p class="text-slate-400 text-sm mt-1">Explore properties tailored to your needs</p>
+    </div>
+<!-- 
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="group relative rounded-2xl overflow-hidden h-64 shadow-lg cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Apartments">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+          <h3 class="text-xl font-bold">Apartments</h3>
+          <p class="text-sm opacity-80">12 Listings</p>
+          <span class="mt-2 text-xs font-bold underline decoration-2 underline-offset-4">View all</span>
+        </div>
+      </div>
+
+      <div class="group relative rounded-2xl overflow-hidden h-64 shadow-lg cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Land">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+          <h3 class="text-xl font-bold">Land</h3>
+          <p class="text-sm opacity-80">12 Listings</p>
+          <span class="mt-2 text-xs font-bold underline decoration-2 underline-offset-4">View all</span>
+        </div>
+      </div>
+
+      <div class="group relative rounded-2xl overflow-hidden h-64 shadow-lg cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Commercial">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
+          <h3 class="text-xl font-bold">Commercial</h3>
+          <p class="text-sm opacity-80">12 Listings</p>
+          <span class="mt-2 text-xs font-bold underline decoration-2 underline-offset-4">View all</span>
+        </div>
+      </div>
+
+      <div class="group relative rounded-2xl overflow-hidden h-64 lg:h-auto shadow-xl border border-slate-800 transition-all hover:border-indigo-500/50 cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Houses">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/20 to-transparent flex flex-col justify-end p-6 text-white">
+          <h3 class="text-xl font-bold">Houses</h3>
+          <p class="text-sm text-slate-300">12 Listings</p>
+          <span class="mt-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 underline decoration-2 underline-offset-4">View all</span>
+        </div>
+      </div>
+    </div> -->
+    
+    <!-- Loading spinner for initial load (when list is empty) -->
+ @if(websiteService.loading()){
+  <div class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="w-14 h-14 border-4 border-slate-600 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+}
+
+    @if(properties().length > 0){
+      <!-- Removed (scroll) here because window listener is used in the component -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    @for(property of properties(); track property.id){
+                    <div class="cursor-pointer bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 shadow-lg hover:shadow-2xl hover:border-slate-600 transition group">
+                        <div class="relative h-48 overflow-hidden">
+                            <img [src]="getCloudinaryUrl(property.hero_image)" alt="House" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm p-1.5 rounded-full text-white cursor-pointer hover:bg-red-500/80 transition">
+                                <i class="ph ph-heart"></i>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-brand-blue text-xl font-bold mb-1">{{property.sale_type == 'both' || property.sale_type == 'sale' ? '$' + property.sale_price?.toLocaleString() : '$' + property.rent_price?.toLocaleString() }}</h3>
+                            <p class="text-white font-medium mb-3">{{property.location_text}}</p>
+                            
+                            
+                        </div>
+                    </div>
+                  }
+
+          
+
+                </div>
+              }
+
+  </main>
+
+  <footer class="bg-[#0b1120] border-t border-slate-800 py-16 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-sm text-slate-400">
+      <div>
+        <div class="flex items-center gap-2 mb-4 text-white">
+          <div class="w-6 h-6 bg-slate-700 rounded-full"></div>
+          <span class="font-serif tracking-widest uppercase font-bold">Propify</span>
+        </div>
+        <p>Your trusted partner in finding the perfect property in any neighborhood.</p>
+      </div>
+      
+      <div>
+        <h4 class="font-bold text-white mb-4 uppercase text-xs tracking-widest">Company</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-indigo-400 transition">About Us</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition">Careers</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition">Press & Media</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white mb-4 uppercase text-xs tracking-widest">Discover</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-indigo-400 transition">Homes for Sale</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition">Apartments for Rent</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-white mb-4 uppercase text-xs tracking-widest">Legal</h4>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-indigo-400 transition">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-indigo-400 transition">Terms & Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="text-center mt-12 text-xs text-slate-600">
+      © 2025 Propify Inc. Crafted for the modern web.
+    </div>
+  </footer>
+
+  <script>
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+
+    btn.addEventListener('click', () => {
+      // Toggle the hidden class
+      menu.classList.toggle('hidden');
+      menu.classList.toggle('flex');
+    });
+  </script>
+
+</div>

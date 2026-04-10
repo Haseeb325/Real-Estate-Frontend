@@ -1,0 +1,107 @@
+    <!-- <div class="relative">
+        <label class="absolute -top-2 left-4 bg-[#0F172A] px-1 text-xs text-blue-400">
+          Email or username
+        </label>
+        <input
+          type="text"
+          placeholder="John@gmail.com"
+          class="w-full rounded-full border border-gray-600 bg-[#1E293B] text-gray-200 px-5 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        />
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-sm">
+          ✓
+        </div>
+      </div> -->
+   
+   <div class="relative">
+       <input
+       #input
+       [autocomplete]="type === 'password' ? 'new-password' : 'off' "
+       [id]="id"
+       [value]="value"
+       [placeholder]="placeholder"
+       [disabled]="isDisabled"
+       (input)="writeValueFromEvent($event)"
+       (blur)="onTouched()"
+       [type]="(isPasswordVisible && type === 'password' ) || type !== 'password' ? 'text' :  'password' "
+       
+      [ngClass]="{ '!border-[#FF3C3C]': errorMessage  || invalid}"
+    class="flex items-center w-full text-sm text-white  bg-[#1E293B] outline-none  placeholder:opacity-0 focus:placeholder:opacity-100 appearance-none focus:outline-none focus:ring-0 focus:border-purple-400 peer md:text-[14px] font-rocaOneBold leading-[14.9px] -tracking-[2%] h-[47px] md:h-[56px] px-6 rounded-[30px] border border-gray-600 disabled:bg-[#F2F2F2] pr-14" />
+
+
+  <label
+    [for]="id"
+    (click)="input.focus()"
+    class="absolute cursor-text duration-300 transform -translate-y-[16px] md:scale-75 top-1 z-10 origin-[0] peer-focus:bg-[#0F172A]  px-1 md:px-2 md:peer-focus:px-2 peer-focus:px-1 py-1  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-1 md:peer-focus:scale-75 peer-focus:-translate-y-[16px] rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-5 text-[12px] text-blue-400 font-rocaOneRg md:text-[14px] md-leading-[15px]"
+      [ngClass]="{' peer-focus:text-[#FF3C3C]' : errorMessage || invalid}" >{{ label }}</label
+  >       
+  <div class="absolute top-[13px] right-6 z-50 flex gap-2 md:top-[18px] ">
+    @if(type == 'password'){
+        <button type="button" class="cursor-pointer"
+        (click)="togglePasswordVisibility()"
+        >
+        <i  class="pi text-[#ded8d8]  cursor-pointer"
+        style="font-size: 20px"
+        [ngClass]="isPasswordVisible ? 'pi-eye-slash' : 'pi-eye' "
+        >
+
+        </i>
+
+        </button>
+
+    }
+    @if(valid && type !== 'password'){
+<i class="pi pi-check-circle text-green-500 text-lg"></i>
+    }
+   @if(value && invalid || (errorMessage || invalid)){
+<i class="pi pi-circle-fill text-red-500"></i>
+   }
+    
+  </div>
+
+
+
+        </div>
+
+@if(finalErrorMessage){
+     <div class="flex gap-2 mt-2 ml-3 h-5 items-center">
+    <div
+      class="w-[20.74px] h-[20.8px] rounded-full flex justify-center items-center bg-[#FFA4A4]"
+      >
+      <i class="pi pi-times text-red-500 text-sm"></i>
+    </div>
+    <p
+    class="text-[#FF3C3C] text-[12px] tracking-[-1%] leading-[14.6px] font-normal font-rocaOneBold pb-[2px]"
+    >
+    {{finalErrorMessage}}
+    </p>
+  </div>
+}     
+
+<!-- Show error message if exists -->
+@if (validationMessages.length) {
+  <div class="my-2 text-sm gap-x-4 flex flex-col md:flex-row justify-start flex-wrap">
+    @for (validation of validationMessages; track $index) {
+      <div
+        class="flex items-center gap-2 py-1 px-3 text-xs sm:text-[15px] font-rocaOneBold"
+        [ngClass]="{
+          'text-[#247905]': validation.valid,
+          'text-[#FF3C3C]': !validation.valid
+        }"
+      >
+        <div
+          class="w-[20px] h-[20px] rounded-full flex justify-center items-center"
+          [ngClass]="{
+            'bg-[#8CE66B] text-[#247905]': validation.valid,
+            'bg-[#FFA4A4] text-[#FF3C3C]': !validation.valid
+          }"
+        >
+         <i 
+  class="pi" 
+  [ngClass]="validation.valid ? 'pi-check text-green-500' : 'pi-times text-red-500'">
+</i>
+        </div>
+        {{ validation.message }}
+      </div>
+    }
+  </div>
+}
