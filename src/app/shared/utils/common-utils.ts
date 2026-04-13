@@ -17,7 +17,7 @@ export function getNestedValue(obj:any, path:string){
 }
 
 // Build full Cloudinary URL from partial path
-export function getCloudinaryUrl(imagePath: string): string {
+export function getCloudinaryUrl(imagePath: any): string {
     if (!imagePath) return '';
     
     // If already a full URL, return as is

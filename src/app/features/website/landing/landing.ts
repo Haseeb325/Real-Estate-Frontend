@@ -5,29 +5,32 @@ import { getCloudinaryUrl } from '../../../shared/utils/common-utils';
 import {Property} from '../../../core/interfaces/property';
 import { useInfiniteScroll } from '../../../shared/infinitScroll';
 import {toObservable, takeUntilDestroyed} from '@angular/core/rxjs-interop'
-import { debounce, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { debounce, debounceTime, distinctUntilChanged, of, skip, switchMap, tap } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { FilterStateService } from '../filter-state.service';
 
 @Component({
   selector: 'app-landing',
-  imports: [FormsModule],
+  imports: [FormsModule,RouterLink],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit, OnDestroy {
 
   websiteService = inject(WebSiteService)
+  private readonly filterState = inject(FilterStateService);
   properties = this.websiteService.propertiesData
 
   // Filter signals for reactive filtering
-  selectedPropertyType:WritableSignal<string> = signal<string>('');
-  selectedPriceRange = signal<string>('');
-  selectedBedrooms = signal<string>('');
-  selectedBathrooms = signal<string>('');
-  selectedFurnishing = signal<string>('');
-  selectedLocation = signal<string>('');
-  minPrice = signal<number>(0);
-  maxPrice = signal<number>(10000000);
-  purchaseType = signal<string>('')
+  selectedPropertyType:WritableSignal<string> = signal<string>(this.filterState.filters()['property_type'] || '');
+  selectedPriceRange = signal<string>(this.filterState.filters()['price_range'] || '');
+  selectedBedrooms = signal<string>(this.filterState.filters()['bedrooms'] || '');
+  selectedBathrooms = signal<string>(this.filterState.filters()['bathrooms'] || '');
+  selectedFurnishing = signal<string>(this.filterState.filters()['furnishing'] || '');
+  selectedLocation = signal<string>(this.filterState.filters()['location_text'] || '');
+  minPrice = signal<number>(this.filterState.filters()['min_price'] ?? 0);
+  maxPrice = signal<number>(this.filterState.filters()['max_price'] ?? 10000000);
+  purchaseType = signal<string>(this.filterState.filters()['sale_type'] || '');
 
   // Computed for unique bedroom options
   uniqueBedrooms = computed(() => {
@@ -76,52 +79,11 @@ export class Landing implements OnInit, OnDestroy {
 
   // private filterTimeout: any;
 
-  constructor() {
-    // Watch filter changes and reload properties with debounce
-   
-const filterStream$ = toObservable(computed(() => ({
-      property_type: this.selectedPropertyType(),
-      price_range: this.selectedPriceRange(),
-      bedrooms: this.selectedBedrooms(),
-      bathrooms: this.selectedBathrooms(),
-      location_text: this.selectedLocation(),
-      furnishing: this.selectedFurnishing(),
-      min_price: this.minPrice(),
-      max_price: this.maxPrice(),
-      sale_type: this.purchaseType()
-    })));
-
-    filterStream$.pipe(
-      debounceTime(400),
-      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
-      tap(()=> this.websiteService.clearCache()), // Clear cache on filter change to ensure fresh data
-      switchMap((filters)=>{
-        // Prepare params for this specific call
-        const activeParams = Object.fromEntries(Object.entries(filters).filter(([_, value]) => value)); // Only include active filters
-        this.params = {
-          ...activeParams,
-          page:1,
-          page_size:7
-        }
-        return this.websiteService.fetchProperties(this.params, false, true) || [];
-      }),
-      takeUntilDestroyed(),
-
-    ).subscribe((res:any)=>{
-      this.hasMore.set(!!res?.next)
-    
-    })
-
+  // constructor() {}
    
 
     // Log when properties data changes
-    effect(() => {
-      const data = this.properties();
-      if (data.length > 0) {
-        console.log('Properties fetched:', data);
-      }
-    });
-  }
+   
 
    onPropertyTypeChange (newType:string){
       this.selectedPropertyType.set(newType)
@@ -130,6 +92,9 @@ const filterStream$ = toObservable(computed(() => ({
       this.selectedLocation.set('')
       this.selectedFurnishing.set('')
       this.selectedPriceRange.set('')
+      this.minPrice.set(0)
+      this.maxPrice.set(10000000)
+      this.purchaseType.set('')
 
     }
 
@@ -150,6 +115,20 @@ const filterStream$ = toObservable(computed(() => ({
   //   this.loadProperties(false)
   // }
 
+  protected getCurrentFilterValue() {
+    return {
+      property_type: this.selectedPropertyType(),
+      price_range: this.selectedPriceRange(),
+      bedrooms: this.selectedBedrooms(),
+      bathrooms: this.selectedBathrooms(),
+      location_text: this.selectedLocation(),
+      furnishing: this.selectedFurnishing(),
+      min_price: this.minPrice(),
+      max_price: this.maxPrice(),
+      sale_type: this.purchaseType()
+    };
+  }
+
   clearAllFilters() {
     this.selectedPropertyType.set('');
     this.selectedPriceRange.set('');
@@ -157,10 +136,11 @@ const filterStream$ = toObservable(computed(() => ({
     this.selectedBathrooms.set('');
     this.selectedLocation.set('');
     this.selectedFurnishing.set('');
-    this.params = {
-      page: 1,
-      page_size: 7,
-    };
+    this.purchaseType.set('');
+    this.minPrice.set(0);
+    this.maxPrice.set(10000000);
+    this.params = { page: 1, page_size: 7 };
+    this.filterState.clearState();
     this.loadProperties(false);
   }
 
@@ -174,11 +154,64 @@ const filterStream$ = toObservable(computed(() => ({
     onLoadMore: () => { this.onLoadMore() },
   })
 
-  ngOnInit(): void {
-    // Initial load is handled by the effect in constructor
-    this.loadProperties();
-    window.addEventListener('scroll', this.scrollHandle);
+   filterStream$ = toObservable(
+    computed(() => this.getCurrentFilterValue())
+  );
+ngOnInit(): void {
+
+  const savedResults = this.filterState.results();
+  const savedFilters = this.filterState.filters();
+
+  //  Step 1: Restore state FIRST
+  if (savedResults.length > 0) {
+    const activeParams = Object.fromEntries(
+      Object.entries(savedFilters).filter(([_, value]) => value)
+    );
+
+    this.params = { ...this.params, ...activeParams };
+    this.hasMore.set(this.filterState.hasMore());
+    this.websiteService.data.set(savedResults);
   }
+
+  // Step 2: THEN setup stream
+
+
+  this.filterStream$.pipe(
+    skip(savedResults.length > 0 ? 1 : 0), // skip the first emission if we have saved results to avoid unnecessary API call ✅ "Skip the first N emissions only once" Because skip(1) only applies once when the stream starts.It does NOT re-check savedResults.length on every emission.
+    debounceTime(400),
+    distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+    tap(() => this.websiteService.clearCache()),
+    switchMap((filters) => {
+      const activeParams = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value)
+      );
+
+      this.params = {
+        ...activeParams,
+        page: 1,
+        page_size: 7
+      };
+
+      return this.websiteService.fetchProperties(this.params, false, true) ?? of (null)
+    }),
+    // takeUntilDestroyed()
+  ).subscribe((res: any) => {
+    this.hasMore.set(!!res?.next);
+    this.filterState.saveState(
+      this.getCurrentFilterValue(),
+      this.properties(),
+      this.hasMore()
+    );
+  });
+
+  // Step 3: Only trigger initial API IF NO CACHE
+  if (savedResults.length === 0) {
+    // manually trigger by changing signal (clean trick)
+    this.selectedPropertyType.set(this.selectedPropertyType());
+  }
+
+  window.addEventListener('scroll', this.scrollHandle);
+}
 
   onLoadMore() {
     this.params.page += 1;
@@ -192,6 +225,7 @@ const filterStream$ = toObservable(computed(() => ({
    if(call$){
     call$.subscribe((res:any)=>{
       this.hasMore.set(!!res?.next)
+      this.filterState.saveState(this.getCurrentFilterValue(), this.properties(), this.hasMore());
     })
    }
   }

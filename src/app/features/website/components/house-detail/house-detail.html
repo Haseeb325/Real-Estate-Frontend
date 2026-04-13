@@ -1,0 +1,76 @@
+<div class="grid grid-cols-1 gap-6 mt-6">
+  <!-- Left Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Key Facts -->
+    <div class="bg-slate-800 p-6 mt-7 rounded-xl border border-slate-700">
+      <h3 class="font-semibold mb-4">Key Facts</h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+        <!-- <div>
+              <p class="text-slate-400">Price</p>
+              <p>$4500</p>
+            </div> -->
+
+        <div>
+          <p class="text-slate-400">Bedrooms</p>
+          <p>{{ data?.bedrooms }}</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Bathrooms</p>
+          <p>{{ data?.bathrooms }}</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Type</p>
+          <p>{{ data?.sub_type }}</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">PLot size</p>
+          <p>{{ data?.plot_size }} sqft</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Year built</p>
+          <p>{{ data?.year_built }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">built Up Area</p>
+          <p>{{ data?.builtup_area }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Floors</p>
+          <p>{{ data?.floors }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Parking</p>
+          <p>{{ data?.parking }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col  gap-4">
+      <!-- Description -->
+      <div class="bg-slate-800 w-full p-6 rounded-xl border border-slate-700">
+        <h3 class="font-semibold mb-3">Description</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ data?.description }}
+        </p>
+      </div>
+   
+
+    <!-- Features -->
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+      <h3 class="font-semibold mb-4">Features & Amenities</h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        @for (f of data?.features; track $index) {
+          <div>✔ {{ f.name }}</div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar -->
+</div>

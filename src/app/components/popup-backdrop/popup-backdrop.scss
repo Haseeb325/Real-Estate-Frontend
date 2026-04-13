@@ -1,0 +1,20 @@
+.center {
+  @apply items-center;
+}
+
+.bottom {
+  @apply items-end ;
+  padding-bottom: var(--pb)
+}
+
+.center-bottom {
+    @apply items-end md:items-center;
+
+}
+.top{
+  @apply items-start h-screen overflow-auto
+}
+
+.topFixed{
+  @apply  top-0 w-full h-screen overflow-auto left-0 right-0 flex justify-center items-start;
+}

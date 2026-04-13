@@ -1,0 +1,89 @@
+<div class="grid grid-cols-1 gap-6 mt-6">
+  <!-- Left Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Key Facts -->
+    <div class="bg-slate-800 p-6 mt-7 rounded-xl border border-slate-700">
+      <h3 class="font-semibold mb-4">Key Facts</h3>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+        <!-- <div>
+              <p class="text-slate-400">Price</p>
+              <p>$4500</p>
+            </div> -->
+
+        <div>
+          <p class="text-slate-400">Area</p>
+          <p>{{ data?.area }} acre</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Zoning</p>
+          <p>{{ data?.plot_type }}</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Frontage</p>
+          <p>{{ data?.frontage }} ft</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Road Width</p>
+          <p>{{ data?.road_width }} sqft</p>
+        </div>
+
+        <div>
+          <p class="text-slate-400">Facing</p>
+          <p>{{ data?.facing }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Depth</p>
+          <p>{{ data?.depth }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Ownership</p>
+          <p>{{ data?.ownership }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Approved by</p>
+          <p>{{ data?.approval_by }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Corner Plot</p>
+          <p>{{ data?.has_corner_plot ? 'Yes' : 'No' }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Permitted Use</p>
+          <p>{{ data?.permitted_use }}</p>
+        </div>
+        <div>
+          <p class="text-slate-400">Permitted Use</p>
+          <p>{{ data?.possession_status }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full gap-4">
+      <!-- Description -->
+      <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+        <h3 class="font-semibold mb-3">Description</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          {{ data?.description }}
+        </p>
+      </div>
+     
+    </div>
+
+    <!-- Features -->
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+      <h3 class="font-semibold mb-4">Features & Amenities</h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+        @for(f of data?.features; track $index ){
+        <div>✔ {{f.name}}</div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar -->
+</div>

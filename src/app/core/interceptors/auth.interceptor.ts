@@ -1,82 +1,82 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  HttpInterceptor,
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpErrorResponse
-} from '@angular/common/http';
+import { inject, Injector, runInInjectionContext } from '@angular/core';
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../../features/auth/auth.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
+let isRefreshing = false;
+const refreshSubject = new BehaviorSubject<boolean | null>(null);
 
-  private authService = inject(AuthService);
+// export const authInterceptor: HttpInterceptorFn = (req, next) => {
+//   const injector = inject(Injector);
 
-  private isRefreshing = false;
-  private refreshSubject = new BehaviorSubject<boolean | null>(null);
+//   const clonedReq = req.clone({
+//     withCredentials: true
+//   });
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+//   return next(clonedReq).pipe(
+//     catchError((error: HttpErrorResponse) => {
+//       if (req.url.includes('/refresh-access-token')) {
+//         return throwError(() => error);
+//       }
 
-    // ✅ ALWAYS send cookies
-    const clonedReq = req.clone({
-      withCredentials: true
-    });
+//       // Don't refresh if the error happened on an auth-related URL
+      // const isAuthUrl = ['/forgot-password', '/sign-in'].some(url => req.url.includes(url));
+//       if (error.status === 401 && !isAuthUrl) {
+//         // Fix NG0203: Provide context for services using inject()
+//         const authService = runInInjectionContext(injector, () => 
+//           injector.get(AuthService)
+//         );
+//         return handle401Error(clonedReq, next, authService);
+//       }
 
-    return next.handle(clonedReq).pipe(
+//       return throwError(() => error);
+//     })
+//   );
+// };
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const injector = inject(Injector);
 
-      catchError((error: HttpErrorResponse) => {
+  return next(req.clone({ withCredentials: true })).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (req.url.includes('/refresh-access-token')) return throwError(() => error);
+       const isAuthUrl = ['/forgot-password', '/sign-in'].some(url => req.url.includes(url));
 
-
-      // ❌ STOP infinite loop for refresh API
-      if (req.url.includes('/refresh-access-token')) {
-        return throwError(() => error);
+      if (error.status === 401 && !isAuthUrl) {
+        // Breaking the loop: Get AuthService only on error
+        const authService = injector.get(AuthService); 
+        return handle401Error(req, next, authService);
       }
+      return throwError(() => error);
+    })
+  );
+};
 
-        // 🔥 HANDLE 401 (TOKEN EXPIRED)
-        if (error.status === 401 && ['/forgot-password', '/sign-in'].includes(req.url)) {
-          return this.handle401Error(clonedReq, next);
-        }
-
-        return throwError(() => error);
-      })
+function handle401Error(req: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService): Observable<HttpEvent<any>> {
+  if (isRefreshing) {
+    return refreshSubject.pipe(
+      filter(val => val === true),
+      take(1),
+      switchMap(() => next(req))
     );
   }
 
-  private handle401Error(req: HttpRequest<any>, next: HttpHandler) {
+  isRefreshing = true;
+  refreshSubject.next(null);
 
-    // If refresh already running → queue requests
-    if (this.isRefreshing) {
-      return this.refreshSubject.pipe(
-        filter(val => val === true),
-        take(1),
-        switchMap(() => next.handle(req))
-      );
-    }
-
-    this.isRefreshing = true;
-    this.refreshSubject.next(null);
-
-    return this.authService.refreshToken().pipe(
-      switchMap(() => {
-        this.isRefreshing = false;
-        this.refreshSubject.next(true);
-
-        // retry original request
-        return next.handle(req);
-      }),
-      catchError((err) => {
-        this.isRefreshing = false;
-        this.refreshSubject.next(false);
-
-        // 🔥 refresh failed → logout user
-        this.authService.logoutUser();
-        return throwError(() => err);
-      })
-    );
-  }
+  return authService.refreshToken().pipe(
+    switchMap(() => {
+      isRefreshing = false;
+      refreshSubject.next(true);
+      return next(req);
+    }),
+    catchError((err) => {
+      isRefreshing = false;
+      refreshSubject.next(false);
+      authService.logoutUser();
+      return throwError(() => err);
+    })
+  );
 }
 
 
@@ -95,5 +95,3 @@ export class AuthInterceptor implements HttpInterceptor {
 //     multi: true
 //   }
 // ]
-
-

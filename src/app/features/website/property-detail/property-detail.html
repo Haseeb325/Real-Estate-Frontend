@@ -1,0 +1,105 @@
+<div class="bg-slate-800 text-slate-200">
+
+  <!-- Navbar -->
+ <button (click)="location.back()">back</button>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Header Section -->
+    <div class="flex flex-row py-4 items-center justify-between gap-6">
+
+      <div>
+        <h2 class="text-2xl md:text-3xl font-semibold">
+          {{property()?.title}}
+        </h2>
+        <p class="text-sm text-slate-400 mt-1"> Listed by {{property()?.user?.full_name}}</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div *ngIf="property()?.sale_type == 'rent' || property()?.sale_type == 'both' " class="text-2xl font-bold" class="text-2xl font-bold">
+        <span  *ngIf="purchaseType=='rent' "> {{splitLastZero(property()?.rent_price)}} PKR</span>
+        </div>
+        <div *ngIf="property()?.sale_type == 'sale' || property()?.sale_type == 'both' "class="text-2xl font-bold">
+        <span *ngIf="purchaseType=='Buy' ">  {{splitLastZero(property()?.sale_price)}} PKR</span>
+        </div>
+        <div class="flex gap-3">
+            @if(property()?.sale_type == 'sale' || property()?.sale_type == 'both'){
+          <button (click)="purchaseType = 'Buy' " class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium">
+            Buy
+          </button>}
+          @if(property()?.sale_type == 'rent' || property()?.sale_type == 'both'){
+          <button (click)="purchaseType = 'rent' " class="px-5 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium">
+            Rent
+          </button>
+        }
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Property Image -->
+    <div class="my-6  rounded-xl overflow-hidden">
+      <img [src]="getCloudinaryUrl(property()?.hero_image)"
+        class="w-full h-64 md:h-96 object-cover"
+        alt="Property">
+    </div>
+
+
+    <!-- Details Section -->
+  <!-- <ng-container [ngSwitch]="property()?.property_type">
+    
+  </ng-container> -->
+
+  @switch (property()?.property_type) {
+    @case ('house') {
+      <app-house-detail [data]="property()?.house || null"></app-house-detail>
+        }
+  @case('apartment'){
+    <app-apartment-detail [data]="property()?.apartment || null"></app-apartment-detail>
+  }
+  @case('commercial'){
+    <app-commercial-detail [data]="property()?.commercial || null"></app-commercial-detail>
+  }
+  @case('plots_and_land'){
+    <app-plot-and-land-detail [data]="property()?.plots_and_land || null"></app-plot-and-land-detail>
+  }
+
+      }
+
+        <div class="bg-slate-800 p-6 mt-5 w-full rounded-xl border border-slate-700 flex justify-between">
+          <p class="text-slate-400 text-sm">List price</p>
+          <h4 class="text-2xl font-bold mt-1">Rs 20</h4>
+
+          <div class="">
+            <button class=" w-full p-3 bg-blue-600 hover:bg-blue-700 rounded-full font-medium">
+              Proceed to buy
+            </button>
+          </div>
+        </div>
+      </div>
+
+    <!-- Map Section -->
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 mt-6">
+      <h3 class="font-semibold mb-3">Location</h3>
+
+      <div class="rounded-lg overflow-hidden">
+        <img src="/assets/images/map.jpg"
+          class="w-full h-96 object-cover"
+          alt="Map">
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3">
+        <p class="text-sm text-slate-400">
+          {{property()?.location_text}}
+        </p>
+        <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">
+          View on full map
+        </button>
+      </div>
+    </div>
+
+  <!-- </div> -->
+
+</div>

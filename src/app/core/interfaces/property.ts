@@ -100,7 +100,7 @@ export interface PlotAndLand {
     updated_at?:string
 }
 
-export interface PropertyDetail extends Property{
+export interface PropertyDetails extends Property{
     images?:PropertImage[],
     security_deposit?:string,
     is_availabe?:boolean,

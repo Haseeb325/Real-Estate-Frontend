@@ -1,5 +1,5 @@
 import { Signal, inject, WritableSignal, signal } from '@angular/core';
-import { tap, finalize, catchError, Observable, throwError } from 'rxjs';
+import { tap, finalize, catchError, Observable, throwError, EMPTY } from 'rxjs';
 import { ApiService } from './api.service';
 import { ToastService } from '../core/services/toast.service';
 import { getNestedValue } from './utils/common-utils';
@@ -10,7 +10,8 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
 
   data: WritableSignal<T[]> = signal([]);
   private detailCache = new Map<any, T> ()
-  selectedItem: WritableSignal<T | null> = signal(null);
+  selectedItem: WritableSignal<any> = signal(null);
+  readonly selectedItem$ = this.selectedItem.asReadonly();
 
   loading: WritableSignal<boolean> = signal(false); // 'fetching', 'creating', 'updating', 'deleting', false
 
@@ -32,11 +33,11 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
   // fetch with cache and inflight guard
 
   protected fetch(request$: Observable<any>, forceRefresh = false, append = false) {
-    if (this.inFlight) return;
+    if (this.inFlight) return EMPTY; // prevent multiple simultaneous requests
 
-    if (!forceRefresh && !append && this.isCacheValid()) return;
+    if (!forceRefresh && !append && this.isCacheValid()) return EMPTY;
 
-    if (!append && this.data().length > 0 && !forceRefresh) return;
+    if (!append && this.data().length > 0 && !forceRefresh) return EMPTY;
 
     this.inFlight = true;
     this.loading.set(true);

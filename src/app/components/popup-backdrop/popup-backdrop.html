@@ -1,0 +1,13 @@
+<div (click)="closePopup()"
+     class="fixed bottom-0 inset-0 z-[10000] backdrop-blur-sm bg-black/15 flex justify-center w-full transition-opacity duration-500 ease-out"
+     [ngClass]="classes ? classes : ''">
+  
+  <div class="flex  justify-center" 
+       (click)="$event.stopPropagation()"
+       [ngClass]="getPosition()" 
+       [style.--pb]="pading_bottom">
+       
+    <ng-content></ng-content>
+    
+  </div>
+</div>

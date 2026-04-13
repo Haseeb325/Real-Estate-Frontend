@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpBackend,HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 
-Injectable({
+@Injectable({
     providedIn:'root'
 })
 
@@ -14,7 +14,7 @@ this.http = new HttpClient(handler)
     }
 
     private getTempToken(){
-        return localStorage.getItem('token')
+        return localStorage.getItem('tempToken')
     }
 
     get(url:string,):Observable<any>{
@@ -28,9 +28,10 @@ this.http = new HttpClient(handler)
         const headers = new HttpHeaders({
             Authorization: `Bearer ${this.getTempToken()}`
        })
-       return this.http.post(url, body, {headers})
+       return this.http.post(url, body, {
+         headers,
+         withCredentials: true 
+       })
     }
 
 }
-
-

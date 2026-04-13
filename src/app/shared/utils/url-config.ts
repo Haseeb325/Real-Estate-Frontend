@@ -17,6 +17,15 @@ export class URLConfig{
 
     // Property EndPoints
     public static getAllProperties = baseUrl+'properties/browse/'
+    public static getSpecificProperty = (id:any)=>{
+    
+    return baseUrl + `properties/browse/${id}/`
+
+    }
+
+    
+    // buyer profile
+    public static buyerProfile = baseUrl+'profile/buyer' 
 
 
 

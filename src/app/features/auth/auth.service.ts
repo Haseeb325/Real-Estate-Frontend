@@ -2,10 +2,9 @@ import { inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { ApiService } from "../../shared/api.service";
 import { URLConfig } from "../../shared/utils/url-config";
 import { ToastService } from "../../core/services/toast.service";
-import { map } from "rxjs/internal/operators/map";
-import { tap } from "rxjs/internal/operators/tap";
-import { catchError, finalize, Observable, throwError } from "rxjs";
+import { catchError, finalize, map, tap, throwError } from "rxjs";
 import { Router } from "@angular/router";
+import { AuthStore } from "../../shared/authStore";
 
 @Injectable({
     providedIn:'root'
@@ -13,14 +12,20 @@ import { Router } from "@angular/router";
 
 export class AuthService{
 
+    // private injector = inject(Injector)
 
-    apiService = inject(ApiService)
-    toastService = inject(ToastService)
+    constructor(
+    private apiService: ApiService,
+    private toastService: ToastService,
+    private authStore: AuthStore,
+    public router: Router
+  ) {}
     private _loading = signal(false)
     readonly isLoading = this._loading.asReadonly()
     tempToken:WritableSignal<string | null> = signal(localStorage.getItem('tempToken') || null)
     emailForReset:WritableSignal<string | null> = signal(localStorage.getItem('email') || null)
     authToken = signal(localStorage.getItem('authToken') || null)
+    // authStore = inject(AuthStore)
 
 protected handleError() {
   return catchError((error) => {
@@ -225,6 +230,9 @@ this.handleError(),this.finalize()
                 localStorage.setItem('authToken',response.data.access)
                 localStorage.removeItem('tempToken')
                 this.tempToken.set(null)
+                this.authStore.setToken(response.data.access)
+                this.authStore.setUser(response.data.user)
+                this.router.navigate(['/landing'])
             }
             
         ),
@@ -238,12 +246,19 @@ refreshToken() {
   return this.apiService.post(
     URLConfig.refreshAccessToken,
     {},
-    { withCredentials: true }
+    { withCredentials: true } // CRITICAL: This allows the cookie to be sent
+  ).pipe(
+    tap((response: any) => {
+      if (response?.status === 200 && response?.data?.access) {
+        this.authStore.setToken(response.data.access);
+        localStorage.setItem('authToken', response.data.access);
+      }
+    })
   );
 }
     
 
-router:Router = inject(Router)
+// router:Router = inject(Router)
 
    logoutUser() {
   this.apiService.post(
@@ -252,6 +267,7 @@ router:Router = inject(Router)
     { withCredentials: true }
   ).subscribe(() => {
     this.clearAuthState();
+    this.authStore?.clearAll()
     this.router.navigate(['/sign-in'])
   });
 }

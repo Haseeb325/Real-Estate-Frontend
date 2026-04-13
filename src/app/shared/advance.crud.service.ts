@@ -6,7 +6,8 @@ import { firstValueFrom } from "rxjs";
 
 export interface postRequestOptions<TModel> {
   url:string,
-  payload?:Partial<TModel>,
+  payload?:Partial<TModel> | FormData,
+  isFormData?: boolean;                 // Flag to skip JSON processing
   autoRefresh?:boolean,
   autoRefreshUrl?:string,
   updateState?:boolean,
@@ -32,6 +33,8 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
     private _selected = signal<TModel | null>(null)
     private _lastFetched = signal<number | null>(null)
     private detailCache = new Map<any, TModel>()
+
+    public singleFetchedItem = signal<TModel | null>(null)
                             //    key  value 
 
     readonly items = computed(() => this._items())
@@ -75,7 +78,7 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
             return await fn()
         }
         catch(err:any){
-            this.toastService.error(err.message || 'Something went wrong')
+            this.toastService.error(err.error.message || 'Something went wrong')
             throw err
         }
         finally{
@@ -88,28 +91,36 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
 
     // Fetch
 
-    async fetch(url:string, params:any = {}, forceRefresh = false, useGlobalLoading = false){
-        if(!forceRefresh && this.isCacheValid()) return 
+   async fetch(url:string, params:any = {}, forceRefresh = false, useGlobalLoading = false){
+    if(!forceRefresh && this.isCacheValid()) return;
+    
+    return this.request(async () => {
+        const response:any = await firstValueFrom(this.apiService.getWithParams<TDto>(url,params));
         
-        return this.request
-        (async () => {
-            const response:any = await firstValueFrom(this.apiService.getWithParams<TDto>(url,params))
-            if(response.status !== 200){
-                throw new Error(response.message || 'Something went wrong')
-            } 
+        if(response.status !== 200){
+            throw new Error(response.message || 'Something went wrong');
+        } 
 
-            const items:TModel[] = (response.data || []).map((dto:TDto)=> this.mapFromDto ? this.mapFromDto(dto) : (dto as unknown as TModel))
-            this._items.set(items)
-            this._lastFetched.set(Date.now())
+        // FIX: Normalize data. If it's a single object (profile), wrap it in an array.
+        const rawData = response.data;
+        this.singleFetchedItem.set(
+            (!Array.isArray(rawData) && rawData) ? (this.mapFromDto ? this.mapFromDto(rawData) : (rawData as TModel)) : null
+        );
+        const dataArray = Array.isArray(rawData) ? rawData : (rawData ? [rawData] : []);
 
-            if(this._defaultSortFn){
-                this.sortItems(this._defaultSortFn)
-            }
+        const items: TModel[] = dataArray.map((dto: TDto) => 
+            this.mapFromDto ? this.mapFromDto(dto) : (dto as unknown as TModel)
+        );
 
-        },useGlobalLoading)
+        this._items.set(items);
+        this._lastFetched.set(Date.now());
 
-    }
-
+        if(this._defaultSortFn){
+            this.sortItems(this._defaultSortFn);
+        }
+        return items;
+    }, useGlobalLoading);
+}
 
     //  Fetch By ID
 
@@ -141,6 +152,7 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
         const{
             url,
             payload,
+            isFormData,
             autoRefresh,
             autoRefreshUrl,
             updateState,
@@ -148,10 +160,14 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
         } = body
 
         return this.request(async()=>{
-            const body = (payload as any)?.toJson()
-            ? (payload as any).toJson()
-            :payload
-            const response:any = await firstValueFrom(this.apiService.post(url,body))
+            let finalBody:any
+            if (isFormData){
+                finalBody = payload
+            }else {
+            // Handle JSON or custom toJson() method
+            finalBody = (payload as any)?.toJson ? (payload as any).toJson() : payload;
+        }
+            const response:any = await firstValueFrom(this.apiService.post(url,finalBody))
             if (response.status != 200){
                 this.toastService.error(response.message)
                 throw new Error (response.message || 'Something wwent wrong')
@@ -187,27 +203,60 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
 
     // update 
 
-    async update(url:string, payload:Partial<TModel>, autoRefresh = false, useGlobalLoading = false){
-        return this.request(async()=>{
-            const response:any = await firstValueFrom(this.apiService.patch(url,payload))
-            if(response.status !== 200){
-                this.toastService.error(response.message || 'Something went wrong')
-                throw new Error(response.message || 'Something went wrong')
+    async update(options: postRequestOptions<TModel>) {
+    const {
+        url,
+        payload,
+        isFormData,
+        autoRefresh,
+        useGlobalLoading
+    } = options;
+
+    return this.request(async () => {
+        // 1. Handle Body Transformation
+        let finalBody: any;
+        if (isFormData) {
+            finalBody = payload;
+        } else {
+            finalBody = (payload as any)?.toJson ? (payload as any).toJson() : payload;
+        }
+
+        // 2. Use PATCH or PUT based on your API requirements
+        const response: any = await firstValueFrom(this.apiService.patch(url, finalBody));
+
+        if (response.status !== 200) {
+            throw new Error(response.message || 'Update failed');
+        }
+
+        // 3. Map Response (Handles both single object and list)
+        const rawData = response.data;
+        const item = this.mapFromDto ? this.mapFromDto(rawData) : (rawData as TModel);
+
+        // 4. Smart State Update
+        this._items.update(items => {
+            if (Array.isArray(item)) {
+                // If backend returns a list, refresh the whole list
+                return item;
             }
-            this.toastService.success('Updated successfully')
-            
-            const item  = this.mapFromDto ? this.mapFromDto(response.data) : (response.data as TModel)
+            // If backend returns one object, find and replace it in the signal
+            return items.map(i => (i as any).id === (item as any).id ? item : i);
+        });
 
-            this._items.update(items => items.map(i => (i as any).id === (item as any).id ? item : i))
+        // 5. Update Selected Item if it's the one we just edited
+        const currentSelected = this._selected();
+        if (currentSelected && (currentSelected as any).id === (item as any).id) {
+            this._selected.set(item);
+        }
 
-            if(autoRefresh){
-                await this.fetch(url,{},true,useGlobalLoading)
-            }
-            return item
+        if (autoRefresh) {
+            await this.fetch(url, {}, true, useGlobalLoading);
+        }
 
-        },useGlobalLoading)
-    }
+        this.toastService.success('Updated successfully');
+        return item;
 
+    }, useGlobalLoading);
+}
 
     async delete(url:string, id:any, autoRefresh = false, useGlobalLoading = false){
 
@@ -232,9 +281,3 @@ export abstract class AdvanceCrudService<TModel, TDto = any>{
 
 
 }
-
-
-
-
-
-
