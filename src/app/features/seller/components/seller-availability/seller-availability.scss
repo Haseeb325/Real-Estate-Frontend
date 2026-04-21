@@ -1,0 +1,90 @@
+:host ::ng-deep {
+  .p-multiselect, .p-datepicker {
+    background: transparent !important;
+    border-color: #374151 !important;
+    color: white !important;
+    width: 100% !important;
+    
+    &:hover {
+      border-color: #3b82f6 !important;
+    }
+
+    .p-multiselect-label {
+      padding: 0.75rem 1rem !important;
+      color: white !important;
+    }
+
+    .p-multiselect-input, .p-datepicker-input {
+      background: transparent !important;
+      color: white !important;
+      padding: 0.75rem 1rem !important;
+      border: none !important;
+    }
+
+    &.p-multiselect-open, &.p-focus {
+      background-color: #1f2937 !important;
+      border-color: #3b82f6 !important;
+    }
+  }
+
+  .p-multiselect-panel {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    border: 1px solid #374151 !important;
+    color: white !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+
+    .p-multiselect-item {
+      background-color: #111827 !important;
+      color: white !important;
+      &:hover {
+        background: #1f2937 !important;
+      }
+      &.p-highlight {
+        background: #3b82f6 !important;
+        color: white !important;
+      }
+    }
+
+    .p-multiselect-header {
+      background: #111827 !important;
+      border-bottom: 1px solid #374151 !important;
+      color: white !important;
+      .p-multiselect-filter-container .p-inputtext {
+        background: #1f2937 !important;
+        color: white !important;
+        border: 1px solid #374151 !important;
+      }
+    }
+  }
+
+  .p-datepicker-panel {
+    background: #111827 !important;
+    background-color: #111827 !important;
+    border: 1px solid #374151 !important;
+    color: white !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+    .p-datepicker-header {
+      background: #111827 !important;
+      background-color: #111827 !important;
+      color: white !important;
+      border-bottom: 1px solid #374151 !important;
+    }
+    .p-hour-picker, .p-minute-picker, .p-second-picker {
+      button {
+        color: white !important;
+      }
+      span {
+        color: white !important;
+      }
+    }
+  }
+
+  .p-multiselect-chip {
+    background: #1e3a8a !important;
+    color: #93c5fd !important;
+    font-weight: 600 !important;
+  }
+}

@@ -1,0 +1,29 @@
+<div class="primeng-select-field">
+  <label *ngIf="label" [for]="id" class="mb-2 block text-sm font-semibold text-gray-300">{{ label }}</label>
+
+  <p-inputgroup>
+    <p-inputgroup-addon *ngIf="prefixIcon">
+      <i class="pi" [ngClass]="'pi-' + prefixIcon"></i>
+    </p-inputgroup-addon>
+
+    <p-select
+      [id]="id"
+      [options]="optionList"
+      [optionLabel]="optionLabel"
+      [optionValue]="optionValue"
+      [placeholder]="placeholder"
+      [showClear]="showClear"
+      [ngModel]="value"
+      [loading]="loading"
+      appendTo="body"
+      (ngModelChange)="handleChange($event)"
+      (onBlur)="onTouched()"
+      [disabled]="isDisabled"
+      [style]="{ width: '100%' }"
+      styleClass="w-full"
+    ></p-select>
+  </p-inputgroup>
+
+  <p *ngIf="finalErrorMessage" class="mt-2 text-sm text-red-400">{{ finalErrorMessage }}</p>
+  <p *ngIf="!finalErrorMessage && helpText" class="mt-2 text-sm text-gray-400">{{ helpText }}</p>
+</div>

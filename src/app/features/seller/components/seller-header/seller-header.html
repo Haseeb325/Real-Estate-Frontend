@@ -1,0 +1,55 @@
+<header class="bg-gray-900 border-b border-gray-800 px-4 md:px-8 py-4">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <!-- Logo -->
+    <div class="flex items-center gap-2">
+      <div
+        class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-400"
+      >
+        P
+      </div>
+      <span class="text-gray-500 text-xs font-semibold tracking-widest hidden sm:inline"
+        >PROFIFY</span
+      >
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex items-center gap-3 md:gap-8 flex-wrap">
+      <button
+        class="bg-orange-500 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-orange-600 transition"
+      >
+        Listings
+      </button>
+      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
+        >Inquiries</a
+      >
+      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
+        >Appointments</a
+      >
+      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
+        >Payment</a
+      >
+    </nav>
+
+    <!-- User Profile -->
+    <div class="flex items-center gap-3">
+      <div class="hidden sm:flex flex-col items-end">
+        <span class="text-gray-100 text-sm font-semibold">{{ user()?.full_name }}</span>
+        <span class="text-gray-500 text-xs">{{ user()?.email }}</span>
+      </div>
+      <div
+        (click)="showProfile = true"
+        class="cursor-pointer w-10 h-10 rounded-full bg-rose-300 flex-shrink-0"
+      ></div>
+    </div>
+  </div>
+</header>
+
+@if (showProfile) {
+  <app-popup-backdrop
+    [closeOnOutsideClick]="true"
+    (onClose)="showProfile = false"
+    layoutKey="center"
+  >
+    <app-seller-profile></app-seller-profile>
+  </app-popup-backdrop>
+}

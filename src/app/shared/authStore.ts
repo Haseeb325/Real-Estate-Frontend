@@ -79,3 +79,163 @@ clearAll() {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // auth.store.ts
+// import { Injectable, signal, computed, WritableSignal, inject } from '@angular/core';
+// import { URLConfig } from '../utils/url-config';
+// import { firstValueFrom } from 'rxjs';
+// import { CookieService } from 'ngx-cookie-service';
+// import CryptoJS from 'crypto-js';
+// import { UserModel } from '../models/user';
+// import { ApiService } from '../services/api.service';
+// import { ToastService } from '../services/toast.service';
+// import { UserDto } from '../models/interfaces';
+
+// @Injectable({ providedIn: 'root' })
+// export class AuthStore {
+//   private tokenKey = 'hims_token';
+//   private userKey = 'hims_user';
+//   private secretKey = 'my_super_secret_key_123';
+
+//   private apiService = inject(ApiService);
+//   private toastService = inject(ToastService);
+//   private cookieService = inject(CookieService);
+
+//   // -----------------------------
+//   // Signals
+//   // -----------------------------
+//   private _token: WritableSignal<string | null> = signal(null);
+//   private _user: WritableSignal<UserModel | null> = signal(null);
+
+//   readonly token = computed(() => this._token());
+//   readonly currentUser = computed(() => this._user());
+//   readonly isAuthenticated = computed(() => !!this._token());
+
+//   constructor() {
+//     this.loadToken();
+//     this.loadUser();
+//   }
+
+//   // -----------------------------
+//   // Encrypt / Decrypt helpers
+//   // -----------------------------
+//   private encrypt(value: string): string {
+//     return CryptoJS.AES.encrypt(value, this.secretKey).toString();
+//   }
+
+//   private decrypt(value: string): string {
+//     const bytes = CryptoJS.AES.decrypt(value, this.secretKey);
+//     return bytes.toString(CryptoJS.enc.Utf8);
+//   }
+
+//   // -----------------------------
+//   // Load token & user from cookie
+//   // -----------------------------
+//   private loadToken() {
+//     const encrypted = this.cookieService.get(this.tokenKey);
+//     if (encrypted) {
+//       try {
+//         this._token.set(this.decrypt(encrypted));
+//       } catch {
+//         this._token.set(null);
+//       }
+//     }
+//   }
+
+//   private loadUser() {
+//     const encrypted = this.cookieService.get(this.userKey);
+//     if (encrypted) {
+//       try {
+//         const dto: UserDto = JSON.parse(this.decrypt(encrypted));
+//         this._user.set(UserModel.fromJson(dto));
+//       } catch {
+//         this._user.set(null);
+//       }
+//     }
+//   }
+
+//   // -----------------------------
+//   // Set token & user
+//   // -----------------------------
+//   private setToken(token: string) {
+//     const encrypted = this.encrypt(token);
+//     this.cookieService.set(this.tokenKey, encrypted, 1, '/');
+//     this._token.set(token);
+//   }
+
+//   private setUser(user: UserModel) {
+//     const dto: UserDto = user.toDto(); // full DTO
+//     const encrypted = this.encrypt(JSON.stringify(dto));
+//     this.cookieService.set(this.userKey, encrypted, 1, '/');
+//     this._user.set(UserModel.fromJson(dto));
+//   }
+
+//   // -----------------------------
+//   // Login
+//   // -----------------------------
+//   async login(userid: string, password: string): Promise<void> {
+//     try {
+//       const response: any = await firstValueFrom(
+//         this.apiService.postRequest(URLConfig.login, { userid, password })
+//       );
+
+//       if (response.status !== 200 || !response.data || !response.data.token) {
+//         throw new Error(response.message || 'Login failed, try again!');
+//       }
+
+//       // ✅ Use full UserDto from API
+//       const userDto: UserDto = response.data.user;
+//       const userModel = UserModel.fromJson(userDto);
+
+//       this.setToken(response.data.token);
+//       this.setUser(userModel);
+
+//       this.toastService.success(`Welcome back, ${userModel.name}!`);
+//     } catch (error: any) {
+//       this.toastService.error(error?.message || 'Login failed');
+//       throw error;
+//     }
+//   }
+
+//   // -----------------------------
+//   // Logout
+//   // -----------------------------
+//   logout(): void {
+//     this.cookieService.delete(this.tokenKey);
+//     this.cookieService.delete(this.userKey);
+//     this._token.set(null);
+//     this._user.set(null);
+//   }
+
+//   // -----------------------------
+//   // Optional: Update user in memory & cookie
+//   // -----------------------------
+//   updateUser(user: UserModel) {
+//     this.setUser(user);
+//   }
+// }

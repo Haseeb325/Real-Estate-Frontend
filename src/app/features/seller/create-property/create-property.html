@@ -1,0 +1,280 @@
+<form
+  [formGroup]="propertyForm"
+  (ngSubmit)="publishListing()"
+  class="flex-1 bg-gray-950 px-4 py-8 md:px-8"
+>
+  <div class="mx-auto max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-8 flex items-start justify-between">
+      <div>
+        <h1 class="mb-2 text-3xl font-bold text-gray-100">
+          {{ isEditMode ? 'Edit listing' : 'Create new listing' }}
+        </h1>
+        <p class="text-sm text-gray-400">
+          {{ isEditMode ? 'Update your' : 'Add a' }} property for
+          <span class="font-semibold">sell or rent</span> across any of your property types.
+        </p>
+      </div>
+      <button
+        type="submit"
+        class="whitespace-nowrap rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+      >
+        {{ isEditMode ? 'Update listing' : 'Publish listing' }}
+      </button>
+    </div>
+
+    <!-- Property Type Tabs -->
+    <div class="mb-8 flex flex-wrap gap-4">
+      @for (type of types; track $index) {
+        <button
+        type="button"
+          (click)="setType(type)"
+          class="text-sm font-semibold transition hover:text-blue-400"
+          [ngClass]="
+            type.isActive ? ' text-blue-500 transition hover:text-blue-400' : 'text-gray-400'
+          "
+        >
+          {{ type.name }}
+        </button>
+      }
+
+      <span class="ml-auto text-sm text-gray-500"
+        >Choose the property category for this listing.</span
+      >
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <!-- Left Column - Form -->
+      <div class="space-y-8 lg:col-span-2">
+        <!-- Basic Details Section -->
+        <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-100">Basic details</h2>
+            <span class="rounded bg-orange-500 px-2 py-1 text-xs font-semibold text-white"
+              >Marketplace</span
+            >
+          </div>
+          <p class="mb-6 text-sm text-gray-400">
+            Describe details and key summary buyers will see here.
+          </p>
+
+          <!-- Listing Title -->
+          <div class="mb-6">
+            <primeng-input-field
+              formControlName="title"
+              placeholder="Describe your title here..."
+              label="Listing title"
+            ></primeng-input-field>
+            <p class="mt-2 text-xs text-gray-500">
+              Make a descriptive title with concise. Buyers see this in search results.
+            </p>
+          </div>
+
+          <!-- Location -->
+          <div class="mb-6 relative">
+            <div (click)="openMap()" class="cursor-pointer">
+              <prime-ng-input-field
+                formControlName="location"
+                placeholder="Click to pick location on map"
+                label="Location"
+                id="locationSearch"
+                class="pointer-events-none"
+              ></prime-ng-input-field>
+            </div>
+
+            <div
+              class="absolute right-12 top-10 text-blue-500 cursor-pointer pointer-events-auto"
+              (click)="openMap()"
+            >
+              <i class="pi pi-map-marker text-lg"></i>
+            </div>
+
+            <button
+              *ngIf="propertyForm.get('location')?.value"
+              type="button"
+              class="absolute right-3 top-10 text-gray-400 hover:text-white pointer-events-auto"
+              (click)="$event.stopPropagation(); clearLocation()"
+            >
+              <i class="pi pi-times text-lg"></i>
+            </button>
+          </div>
+          <div class="mb-6">
+            <prime-ng-input-field
+              formControlName="location_text"
+              placeholder="Select Your city"
+              label="city"
+            ></prime-ng-input-field>
+          </div>
+        </div>
+
+        <!-- Property Features Section -->
+        @if (property_type == 'house') {
+          <app-house-detail-form></app-house-detail-form>
+        } @else if (property_type == 'apartment') {
+          <app-apartment-detail-form></app-apartment-detail-form>
+        } @else if (property_type == 'plots_and_land') {
+          <app-plot-and-land-detail-form></app-plot-and-land-detail-form>
+        } @else if (property_type == 'commercial') {
+          <app-commercial-detail-form></app-commercial-detail-form>
+        }
+      </div>
+
+      <!-- Right Column - Photos & Pricing -->
+      <div class="space-y-8 lg:col-span-1">
+        <!-- Photos Section -->
+        <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+          <h2 class="mb-2 text-lg font-bold text-gray-100">Photos and media</h2>
+          <p class="mb-6 text-sm text-gray-400">Add high-quality images to attract more buyers.</p>
+
+          <!-- Hero Image Upload -->
+          <h3 class="mb-2 text-sm font-semibold text-gray-300">Hero Image (Cover Photo)</h3>
+
+          <div
+            *ngIf="!heroImagePreview"
+            class="relative mb-6 rounded-lg border-2 border-dashed border-gray-700 bg-gray-800 p-8 text-center transition hover:bg-gray-700 cursor-pointer"
+          >
+            <input
+              type="file"
+              accept="image/*"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              (change)="onHeroImageSelected($event)"
+            />
+            <i class="pi pi-image text-3xl text-gray-400 mb-2"></i>
+            <p class="mb-1 text-sm text-gray-400">Click to upload Hero Image</p>
+            <p class="text-xs text-gray-500">JPEG, JPG, PNG. Max 1 file.</p>
+          </div>
+
+          <div
+            *ngIf="heroImagePreview"
+            class="relative mb-6 w-full h-48 rounded-lg overflow-hidden border border-gray-700"
+          >
+            <img [src]="heroImagePreview" class="w-full h-full object-cover" alt="Hero Preview" />
+            <button
+              type="button"
+              (click)="removeHeroImage()"
+              class="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow transition hover:bg-red-600"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+
+          <!-- Gallery Upload -->
+          <h3 class="mb-2 text-sm font-semibold text-gray-300">Gallery Images</h3>
+
+          <div
+            class="relative mb-4 rounded-lg border-2 border-dashed border-gray-700 bg-gray-800 p-6 text-center transition hover:bg-gray-700 cursor-pointer"
+          >
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              (change)="onGalleryImagesSelected($event)"
+            />
+            <i class="pi pi-images text-2xl text-gray-400 mb-2"></i>
+            <p class="text-sm text-gray-400">Click to upload Gallery photos</p>
+          </div>
+
+          <!-- Gallery Previews Grid -->
+          <div *ngIf="galleryPreviews.length > 0" class="grid grid-cols-3 gap-3">
+            <div
+              *ngFor="let preview of galleryPreviews; let i = index"
+              class="relative aspect-square rounded-lg overflow-hidden border border-gray-700"
+            >
+              <img [src]="preview.url" class="w-full h-full object-cover" alt="Gallery Preview" />
+              <button
+                type="button"
+                (click)="removeGalleryImage(i)"
+                class="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow transition hover:bg-red-600"
+              >
+                <i class="pi pi-times text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="rounded-lg border-2 border-blue-600 bg-gray-900 p-6">
+          <h2 class="mb-6 text-lg font-bold text-gray-100">Pricing</h2>
+          <p class="mb-6 text-sm text-gray-400">
+            Set price and choose if this is sell, rent or both
+          </p>
+
+          <!-- Mode Selection -->
+          <div class="mb-6">
+            <label class="mb-3 block text-sm font-semibold text-gray-300">Mode</label>
+            <div class="flex gap-2">
+              @for (mode of sale_modes; track $index) {
+                <button
+                type="button"
+                  (click)="setMode(mode)"
+                  class="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-700"
+                  [ngClass]="
+                    mode.isActive
+                      ? 'bg-orange-500 text-white hover:bg-orange-600'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  "
+                >
+                  {{ mode.mode }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- For Sell -->
+          <div
+            *ngIf="sale_type == 'both' || sale_type == 'sale'"
+            class="mb-6 border-b border-gray-800 pb-6"
+          >
+            <h3 class="mb-3 text-sm font-semibold text-gray-100">For sell</h3>
+            <div>
+              <prime-ng-input-field
+                formControlName="sale_price"
+                placeholder="Enter price here"
+                label="Price"
+              ></prime-ng-input-field>
+            </div>
+          </div>
+
+          <!-- For Rent -->
+          <div *ngIf="sale_type == 'both' || sale_type == 'rent'" class="mb-6">
+            <h3 class="mb-3 text-sm font-semibold text-gray-100">For rent</h3>
+            <div class="space-y-3">
+              <div>
+                <prime-ng-input-field
+                  formControlName="security_deposit"
+                  placeholder="e.g 50000 pkr"
+                  label="Security Deposit"
+                ></prime-ng-input-field>
+              </div>
+              <div>
+                <primeng-input-field
+                  formControlName="rent_price"
+                  placeholder="e.g 30000 pkr"
+                  label="Monthly Rent"
+                ></primeng-input-field>
+              </div>
+            </div>
+          </div>
+
+          <!-- Refundable -->
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-gray-300">Refundable</label>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-400">Yes / No</span>
+              <span class="text-xs text-gray-500">Icon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<app-map-location-picker
+  *ngIf="isMapOpen"
+  (locationSelected)="handleLocationSelected($event)"
+  (cancel)="closeMap()"
+>
+</app-map-location-picker>

@@ -1,0 +1,81 @@
+<div *ngIf="houseDetailForm" [formGroup]="houseDetailForm" class="rounded-lg border my-5 border-gray-800 bg-gray-900 p-6">
+  <h2 class="mb-6 text-lg font-bold text-gray-100">Property features</h2>
+  <p class="mb-6 text-sm text-gray-400">Structure, Parking, outdoor space and highlights.</p>
+
+  <!-- Features Grid -->
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Property Subtype -->
+    <prime-ng-select-field
+      formControlName="bedrooms"
+      [options]="optionService.bedrooms()"
+      placeholder="Select bedrooms"
+      label="Bedrooms"
+      [showClear]="!!houseDetailForm.get('bedrooms')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+
+    <prime-ng-select-field
+      formControlName="bathrooms"
+      [options]="optionService.bathrooms()"
+      placeholder="Select bathrooms"
+      label="Bathrooms"
+      [showClear]="!!houseDetailForm.get('bathrooms')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+    <primeng-input-field  formControlName="builtup_area" placeholder="e.g 200 sqft" label="Built Up Area"></primeng-input-field>
+    <primeng-input-field  formControlName="year_built" placeholder="e.g 2016" label="Year Built"></primeng-input-field>
+    <prime-ng-select-field
+      formControlName="parking"
+      [options]="optionService.houseParking()"
+      placeholder="Select parking spaces"
+      label="Parking Spaces"
+      [showClear]="!!houseDetailForm.get('parking')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+    <prime-ng-input-field  formControlName="plot_size" label="Plot Size" placeholder="e.g 200 sqft"></prime-ng-input-field>
+    <prime-ng-input-field  formControlName="floors" label="Floors" placeholder="e.g 2"></prime-ng-input-field>
+    <prime-ng-select-field
+     formControlName="sub_type"
+      [options]="optionService.houseSubType()"
+      [showClear]="!!houseDetailForm.get('sub_type')?.dirty"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Choose type"
+      label="House Type"
+    ></prime-ng-select-field>
+    <div class="flex gap-2 items-center">
+
+      <prime-ng-input-field
+        name="newFeature"
+        [(ngModel)]="newFeature"
+        [ngModelOptions]="{standalone: true}"
+        placeholder="e.g gas , water"
+        label="Add multiple features"
+      ></prime-ng-input-field>
+      <button type="button" class="whitespace-nowrap rounded-lg mt-6 bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700" (click)="addFeatures()">Add</button>
+    </div>
+      <!-- Features Chips -->
+      <div *ngIf="houseDetailForm.get('features')?.value && houseDetailForm.get('features')?.value.length > 0" class="flex flex-wrap gap-2 mt-4">
+        <div *ngFor="let feature of houseDetailForm.get('features')?.value; let i = index" class="flex items-center bg-gray-800 text-gray-100 px-3 py-1 rounded-full">
+          {{ feature }}
+          <button type="button" class="ml-2 text-gray-400 hover:text-gray-200" (click)="removeFeatures(i)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- Description Section -->
+  <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+    <prime-ng-input-field
+     formControlName="description"
+      type="textarea"
+      label="Description"
+      placeholder="Describe the layout, neighborhood and what makes this property special..."
+    ></prime-ng-input-field>
+  </div>
+</div>

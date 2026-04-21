@@ -15,8 +15,22 @@ export class ProfileService extends AdvanceCrudService<BuyerProfile,BuyerProfile
 //     return this.fetch(URLConfig.buyerProfile)
 //    }
 
+constructor() {
+    super();
+    // CRITICAL: This is the missing link!
+    this.mapFromDto = (dto: BuyerProfileDto) => BuyerProfile.fromJson(dto);
+  }
+
 async getProfile(){
   return await this.fetch(URLConfig.buyerProfile)
    }
+
+
+   updateProfile(options: { url?: string, payload: Partial<BuyerProfile> | FormData, isFormData?: boolean, autoRefresh?: boolean, autoRefreshUrl?: string, updateState?: boolean, useGlobalLoading?: boolean }) {
+    return this.update({ url: URLConfig.buyerProfile, ...options });
+   }
+
+
+
 
 }

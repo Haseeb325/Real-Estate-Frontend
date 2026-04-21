@@ -1,0 +1,22 @@
+:host {
+    display: block;
+}
+
+// Custom scrollbar for description if it gets too long
+.whitespace-pre-line {
+    max-height: 500px;
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #111827;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #374151;
+        border-radius: 10px;
+    }
+}

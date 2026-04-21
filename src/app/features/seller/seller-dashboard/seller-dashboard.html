@@ -1,0 +1,66 @@
+<div class="bg-gray-950 text-gray-100">
+  <div class="min-h-screen flex flex-col">
+    <!-- Main Content -->
+    <main class="px-4 md:px-8 py-8 bg-gray-950">
+      <div class="max-w-7xl mx-auto">
+        <!-- Dashboard Header -->
+        <div class="flex items-start justify-between mb-8">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-100 mb-2">Seller Dashboard</h1>
+            <p class="text-gray-400 text-sm">Manage your Listings in one place.</p>
+          </div>
+          <button
+            [routerLink]="['/seller/create-listing']"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm whitespace-nowrap"
+          >
+            + Create new listing
+          </button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+          <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
+            <p class="text-gray-400 text-xs uppercase tracking-wider mb-2">Active listings</p>
+            <h2 class="text-4xl font-bold text-gray-100 mb-2">{{ activeCount() }}</h2>
+          </div>
+          <div class="bg-gray-900 rounded-lg border border-gray-800 p-6">
+            <p class="text-gray-400 text-xs uppercase tracking-wider mb-2">Total listings</p>
+            <h2 class="text-4xl font-bold text-gray-100 mb-2">{{ totalCount() }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart DataTable with Dynamic Filters -->
+      <div class="max-w-7xl mx-auto mt-8">
+        <app-data-table
+          [data]="dashboardService.data"
+          [columns]="columns"
+          [filterConfig]="filters"
+          [loading]="dashboardService.loading"
+          [serverFilter]="true"
+          [totalRecords]="totalCount()"
+          [pageSize]="params.page_size"
+          [currentPage]="params.page"
+          (pageChange)="onPageChange($event)"
+          (filterChange)="filterChanged($event)"
+          [rowActions]="rowActions"
+        >
+          <!-- only add filterChange when we need server-side filtering means new fresh api call otherwise do serverfilter = false -->
+        </app-data-table>
+      </div>
+    </main>
+  </div>
+</div>
+
+@if (showAvailabilityPopup()) {
+  <app-popup-backdrop
+    [closeOnOutsideClick]="true"
+    (onClose)="showAvailabilityPopup.set(false)"
+    layoutKey="center"
+  >
+    <app-seller-availability
+      [propertyId]="selectedPropertyId()!"
+      (close)="showAvailabilityPopup.set(false)"
+    ></app-seller-availability>
+  </app-popup-backdrop>
+}

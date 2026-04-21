@@ -9,7 +9,7 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
   protected apiService = inject(ApiService);
 
   data: WritableSignal<T[]> = signal([]);
-  private detailCache = new Map<any, T> ()
+  private detailCache = new Map<any, T>();
   selectedItem: WritableSignal<any> = signal(null);
   readonly selectedItem$ = this.selectedItem.asReadonly();
 
@@ -51,11 +51,11 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
         console.log('response from api', response.data);
 
         if (append) {
-          this.data.update(items => [...items, ...response.data]);
+          this.data.update((items) => [...items, ...response.data]);
         } else {
           this.data.set(response.data);
         }
-        console.log('data set in service', this.data())
+        console.log('data set in service', this.data());
         this.lastFetched.set(Date.now());
       }),
 
@@ -71,7 +71,7 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
     );
   }
 
-//   fetch with id
+  //   fetch with id
   fetchById(idValue: any, idKey: string, request$: Observable<any>) {
     this.loading.set(true);
 
@@ -80,9 +80,9 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
       return; // because already selected
     }
 
-    const existing = this.detailCache.get(idValue)
+    const existing = this.detailCache.get(idValue);
     if (existing) {
-        this.selectedItem.set(existing);
+      this.selectedItem.set(existing);
       this.loading.set(false);
       return; //   already in cache
     }
@@ -93,128 +93,102 @@ export abstract class BaseCrudService<T extends Record<string, any>> {
           throwError(() => new Error(response.message || 'Something went'));
         }
 
-       const item = response.data
-       this.detailCache.set(idValue,item)
-       this.selectedItem.set(item)
+        const item = response.data;
+        this.detailCache.set(idValue, item);
+        this.selectedItem.set(item);
 
-//         this.cachedData.update(items=>{
-//             const exists = items.find((item)=> getNestedValue(item, idKey) === idValue)
-//            return exists
-//   ? items.map(i =>
-//       getNestedValue(i, idKey) === idValue ? item : i
-//     )
-//   : [...items, item];
-//         })
-
+        //         this.cachedData.update(items=>{
+        //             const exists = items.find((item)=> getNestedValue(item, idKey) === idValue)
+        //            return exists
+        //   ? items.map(i =>
+        //       getNestedValue(i, idKey) === idValue ? item : i
+        //     )
+        //   : [...items, item];
+        //         })
       }),
 
-      catchError(err =>{
-        this.toastService.error(err.message || 'Something went wrong')
+      catchError((err) => {
+        this.toastService.error(err.message || 'Something went wrong');
         return throwError(() => new Error(err.message || 'Something went wrong'));
       }),
       finalize(() => {
-        this.loading.set(false)
-      })
-
-
+        this.loading.set(false);
+      }),
     );
   }
 
+  // create
 
-// create
-
-protected createItem(
-    url:string,
-    payload:Partial<T> | FormData
-){
-    this.loading.set(true)
+  protected createItem(url: string, payload: Partial<T> | FormData) {
+    this.loading.set(true);
     return this.apiService.post(url, payload).pipe(
-        tap((response:any)=>{
-            if(response.status !== 200){
-                this.toastService.error(response.message || 'Failed to create')
-                throw new Error(response.message || 'Failed to create')
-            }
-            this.selectedItem.set(response.data)
-        }),
-        catchError((err)=>{
-            this.toastService.error(err.message || 'Failed to create')
-            return throwError(() => new Error(err.message || 'Failed to create'))
-        }),
-        finalize(()=>{
-            this.loading.set(false)
-        })
-    )
-}
+      tap((response: any) => {
+        if (response.status !== 200) {
+          this.toastService.error(response.message || 'Failed to create');
+          throw new Error(response.message || 'Failed to create');
+        }
+        this.selectedItem.set(response.data);
+      }),
+      catchError((err) => {
+        this.toastService.error(err.message || 'Failed to create');
+        return throwError(() => new Error(err.message || 'Failed to create'));
+      }),
+      finalize(() => {
+        this.loading.set(false);
+      }),
+    );
+  }
 
-
-protected updateItem(
-    id:any,
-    request$:Observable<any>,
-    payload:Partial<T> | FormData,
-    idKey: keyof T
-){
-
-    const previousState = this.data()
+  protected updateItem(
+    id: any,
+    request$: Observable<any>,
+    payload: Partial<T> | FormData,
+    idKey: keyof T,
+  ) {
+    const previousState = this.data();
 
     // optimistic update
-    this.data.update(old=>
-        old.map(item => item[idKey] == id ? {...item, ...payload} : item)
-    )
+    this.data.update((old) =>
+      old.map((item) => (item[idKey] == id ? { ...item, ...payload } : item)),
+    );
 
     return request$.pipe(
-        tap(response => {
-            if(response.status !== 200){
-                this.toastService.error(response.message || 'Failed to update')
-                throw new Error(response.message || 'Failed to update')
-            }
-            this.toastService.success('Updated successfully')
+      tap((response) => {
+        if (response.status !== 200) {
+          this.toastService.error(response.message || 'Failed to update');
+          throw new Error(response.message || 'Failed to update');
+        }
+        this.toastService.success('Updated successfully');
+      }),
+      catchError((err) => {
+        // Rollback
+        this.data.set(previousState);
+        this.toastService.error(err.message || 'Failed to update');
+        return throwError(() => new Error(err.message || 'Failed to update'));
+      }),
+    );
+  }
 
-        }),
-        catchError(err=>{
-             // Rollback
-            this.data.set(previousState)
-            this.toastService.error(err.message || 'Failed to update')
-            return throwError(() => new Error(err.message || 'Failed to update'))
-        }),
-    )
-
-}
-
-
-
-protected deleteItem(
-    id:any,
-    request$:Observable<any>,
-    idKey: keyof T
-){
-
-    const previousState = this.data()
+  protected deleteItem(id: any, request$: Observable<any>, idKey: keyof T) {
+    const previousState = this.data();
 
     // optimistic update
-    this.data.update(old=>
-        old.filter(item => item[idKey] !== id)
-    )
+    this.data.update((old) => old.filter((item) => item[idKey] !== id));
 
     return request$.pipe(
-        tap(response => {
-            if(response.status !== 200){
-                this.toastService.error(response.message || 'Failed to delete')
-            throwError(()=> new Error(response.message || 'Failed to delete'))
-            }
-            this.toastService.success('Deleted successfully')
-        }),
-        catchError(err =>{
-            // Rollback
-            this.data.set(previousState)
-            this.toastService.error(err.message || 'Failed to delete')
-            return throwError(() => new Error(err.message || 'Failed to delete'))
-        })
-    )
-
-
-
-}
-
-
-
+      tap((response) => {
+        if (response.status !== 200) {
+          this.toastService.error(response.message || 'Failed to delete');
+          throwError(() => new Error(response.message || 'Failed to delete'));
+        }
+        this.toastService.success('Deleted successfully');
+      }),
+      catchError((err) => {
+        // Rollback
+        this.data.set(previousState);
+        this.toastService.error(err.message || 'Failed to delete');
+        return throwError(() => new Error(err.message || 'Failed to delete'));
+      }),
+    );
+  }
 }

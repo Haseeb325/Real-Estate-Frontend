@@ -10,4 +10,6 @@ import { House, PropertyDetails } from '../../../../core/interfaces/property';
 })
 export class HouseDetail {
   @Input() data!: House | null;
+
+
 }

@@ -1,0 +1,151 @@
+<div
+  *ngIf="commercialDetailForm"
+  [formGroup]="commercialDetailForm"
+  class="rounded-lg border my-5 border-gray-800 bg-gray-900 p-6"
+>
+  <h2 class="mb-6 text-lg font-bold text-gray-100">Property features</h2>
+  <p class="mb-6 text-sm text-gray-400">Structure, Parking, outdoor space and highlights.</p>
+
+  <!-- Features Grid -->
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Property Subtype -->
+    <prime-ng-select-field
+      formControlName="commercial_type"
+      [options]="optionService.commercialType()"
+      placeholder="Select type"
+      label="Type"
+      [showClear]="!!commercialDetailForm.get('commercial_type')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+
+    <prime-ng-select-field
+      formControlName="commercial_subtype"
+      [options]="commercialSubtypes()"
+      placeholder="Select type"
+      label="Sub Type"
+      [showClear]="!!commercialDetailForm.get('commercial_type')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+
+    <prime-ng-select-field
+      formControlName="furnishing"
+      [options]="optionService.commercialFurnishing()"
+      [showClear]="!!commercialDetailForm.get('furnishing')?.dirty"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Choose type"
+      label="Furnishing"
+    ></prime-ng-select-field>
+
+    <prime-ng-select-field
+      formControlName="building_grade"
+      [options]="optionService.commercialBuildingGrade()"
+      [showClear]="!!commercialDetailForm.get('building_grade')?.dirty"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Choose type"
+      label="Building Grade"
+    ></prime-ng-select-field>
+
+    <prime-ng-input-field formControlName="ownership" placeholder="ownership" label="Ownership">
+    </prime-ng-input-field>
+    <prime-ng-input-field
+      formControlName="builtup_area"
+      placeholder="builtup area"
+      label="Built Up Area"
+    >
+    </prime-ng-input-field>
+
+    <prime-ng-input-field
+      formControlName="useable_area"
+      placeholder="useable area"
+      label="Useable Area"
+    >
+    </prime-ng-input-field>
+    <prime-ng-input-field
+      formControlName="floor_number"
+      placeholder="Floor Number"
+      label="Floor Number"
+    >
+    </prime-ng-input-field>
+    <prime-ng-input-field formControlName="frontage" placeholder="Frontage" label="Frontage">
+    </prime-ng-input-field>
+
+    <prime-ng-select-field
+      formControlName="bathrooms"
+      [options]="optionService.bathrooms()"
+      placeholder="Select bathrooms"
+      label="Bathrooms"
+      [showClear]="!!commercialDetailForm.get('bathrooms')?.dirty"
+      optionValue="value"
+      optionLabel="label"
+    ></prime-ng-select-field>
+
+    <prime-ng-input-field formControlName="parking_details" placeholder="Parking" label="Parking">
+    </prime-ng-input-field>
+
+    <prime-ng-select-field
+      formControlName="has_kitchen"
+      [options]="optionService.commercialHasKitchen()"
+      [showClear]="!!commercialDetailForm.get('has_kitchen')?.dirty"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Choose type"
+      label="Has Kitchen"
+    ></prime-ng-select-field>
+
+    <div class="flex flex-col col-span-1 md:col-span-2">
+      <div class="flex gap-2 items-center w-full md:w-1/2">
+        <prime-ng-input-field
+          name="newFeature"
+          [(ngModel)]="newFeature"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="e.g gas , water"
+          label="Add multiple features"
+          class="w-full"
+        ></prime-ng-input-field>
+        <button
+          type="button"
+          class="whitespace-nowrap rounded-lg mt-6 bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          (click)="addFeature()"
+        >
+          Add
+        </button>
+      </div>
+      <!-- Features Chips -->
+      <div
+        *ngIf="
+          commercialDetailForm.get('features')?.value &&
+          commercialDetailForm.get('features')?.value.length > 0
+        "
+        class="flex flex-wrap gap-2 mt-4"
+      >
+        <div
+          *ngFor="let feature of commercialDetailForm.get('features')?.value; let i = index"
+          class="flex items-center bg-gray-800 text-gray-100 px-3 py-1 rounded-full border border-gray-700"
+        >
+          {{ feature }}
+          <button
+            type="button"
+            class="ml-2 text-gray-400 hover:text-gray-200"
+            (click)="removeFeature(i)"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description Section -->
+  <div class="rounded-lg border border-gray-800 bg-gray-900 p-6">
+    <prime-ng-input-field
+      formControlName="description"
+      type="textarea"
+      label="Description"
+      placeholder="Describe the layout, neighborhood and what makes this property special..."
+    ></prime-ng-input-field>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+.primeng-select-field {
+  display: block;
+}
+
+.primeng-select-field label {
+  display: block;
+}
+
+.primeng-select-field .p-inputgroup {
+  width: 100%;
+
+}
+
+.primeng-select-field .p-inputgroupaddon {
+  background-color: #111827;
+  border-color: #374151;
+  color: #94a3b8;
+
+}
+
+.primeng-select-field .p-inputgroupaddon i {
+  font-size: 1rem;
+}
+
+.primeng-select-field .p-select {
+  width: 100%;
+  border-radius: 0.60rem;
+  border: 1px solid #374151;
+  background-color: #111827;
+  color: #f8fafc;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  padding: 10px;
+
+}
+
+.primeng-select-field .p-select:hover,
+.primeng-select-field .p-select:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.primeng-select-field .p-select .p-inputwrapper {
+  width: 100%;
+}
+
+.primeng-select-field .p-select .p-select-label {
+  color: #f8fafc;
+}
+
+.primeng-select-field .p-select .p-select-label.p-placeholder {
+  color: #94a3b8;
+}
+
+.primeng-select-field .p-select .p-select-dropdown-icon {
+  color: #94a3b8;
+}
+
+.primeng-select-field .p-select .p-select-clear-icon {
+  color: #94a3b8;
+}
+
+.primeng-select-field .p-select .p-select-overlay {
+  background-color: #111827;
+}
+
+.primeng-select-field .p-select .p-select-list {
+  background-color: #111827;
+  color: #f8fafc;
+}
+
+.primeng-select-field .p-select .p-select-option {
+  color: #f8fafc;
+}

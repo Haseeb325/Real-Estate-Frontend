@@ -4,6 +4,28 @@
 @tailwind utilities;
 @import "primeicons/primeicons.css";
 
+/* PrimeNG select overlay styling */
+.p-select-overlay,
+.p-select-overlay .p-select-list,
+.p-select-overlay .p-select-option,
+.p-select-overlay .p-select-option-label,
+.p-select-overlay .p-select-header,
+.p-select-overlay .p-select-empty-message,
+.p-select-overlay .p-select-filter .p-inputtext {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+  padding: 0.2rem 0 !important;
+}
+
+.p-select-overlay .p-select-option:hover,
+.p-select-overlay .p-select-option.p-highlight {
+  background-color: #1f2937 !important;
+  padding: 5px 10px !important;
+}
+
+.p-select-overlay .p-select-empty-message {
+  color: #f8fafc !important;
+}
 
 .p-toast {
   width: auto;
@@ -45,7 +67,6 @@
   color: #6b7280;
 }
 
-
 .p-button {
   display: flex !important;
   align-items: center !important;
@@ -61,4 +82,66 @@
 /* Label spacing */
 .p-button-label {
   margin-left: 6px !important;
+}
+
+/* Custom Action Menu (Dark Premium) */
+.custom-action-menu {
+  background: #111827 !important; /* gray-900 */
+  border: 1px solid #1f2937 !important; /* gray-800 */
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5) !important;
+  padding: 4px !important;
+  min-width: 180px !important;
+  overflow: hidden !important;
+
+  /* Remove default PrimeNG popover arrow/padding */
+  &.p-popover {
+    &::before, &::after {
+        display: none !important;
+    }
+  }
+  
+  .p-popover-content {
+      padding: 0 !important;
+  }
+}
+
+.menu-item-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #94a3b8; /* slate-400 */
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+
+  &:hover {
+    background: #1f2937; /* gray-800 */
+    color: #f1f5f9; /* slate-100 */
+    
+    i {
+        color: #3b82f6; /* blue-500 */
+    }
+  }
+
+  i {
+    font-size: 14px;
+    transition: color 0.2s ease;
+  }
+
+  &.danger {
+      color: #ef4444;
+      &:hover {
+          background: rgba(239, 68, 68, 0.1);
+          color: #f87171;
+          i { color: #f87171; }
+      }
+  }
 }

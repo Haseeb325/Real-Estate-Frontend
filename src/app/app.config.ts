@@ -28,6 +28,8 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { MessageService } from 'primeng/api';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthStore } from './shared/authStore';
+import { providePrimeNG } from 'primeng/config';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export function initializeAuth(authStore: AuthStore) {
   return (): Promise<void> => {
@@ -57,6 +59,8 @@ export const appConfig: ApplicationConfig = {
     },
 
     provideHttpClient(withInterceptors([authInterceptor])),
+    provideAnimationsAsync(),
+    providePrimeNG()
   ]
 };
 

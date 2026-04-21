@@ -1,0 +1,185 @@
+<div class="text-gray-100">
+  <!-- Dynamic Filter Section -->
+  <div
+    class="bg-gray-900 rounded-lg border border-gray-800 p-4 mb-6"
+    *ngIf="filterConfig.length > 0"
+  >
+    <div class="flex flex-col w-full justify-center items-center gap-6">
+      <!-- Top: Dynamic Buttons (Categories, Mode, Status) -->
+      <div class="flex gap-3 flex-wrap">
+        @for (filter of filterConfig; track filter.field) {
+          @if (filter.type === 'buttons') {
+            <div class="flex gap-2 flex-wrap">
+              @for (opt of filter.options; track opt.id) {
+                <button
+                  (click)="updateFilter(filter.field, opt.id)"
+                  [class]="
+                    (activeFilters()[filter.field] || 'all') === opt.id
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-900/20'
+                      : 'bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700 hover:text-white'
+                  "
+                  class="px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border"
+                >
+                  {{ opt.label }}
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Bottom: Dynamic Search -->
+      <div class="w-full">
+        @for (filter of filterConfig; track filter.field) {
+          @if (filter.type === 'search') {
+            <div class="relative max-w-md">
+              <i
+                class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"
+              ></i>
+              <input
+                type="text"
+                [placeholder]="filter.label"
+                (input)="onSearchInput($event)"
+                class="bg-gray-800 border border-gray-700 text-gray-100 rounded-xl pl-11 pr-4 py-3 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all w-full text-sm shadow-inner"
+              />
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Grid Header -->
+  <div
+    class="hidden lg:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-800 rounded-t-lg text-gray-400 text-[10px] font-bold uppercase tracking-widest border-x border-t border-gray-800"
+  >
+    @for (col of columns(); track col.field; let i = $index) {
+      <div [class]="i === 0 ? 'col-span-1' : i === 1 ? 'col-span-3' : 'col-span-2'">
+        {{ col.header }}
+      </div>
+    }
+    <div class="col-span-1 text-right">Actions</div>
+  </div>
+
+  <!-- Main Table Structure -->
+  <p-table
+    [value]="displayData()"
+    [rows]="pageSize"
+    [paginator]="false"
+    [loading]="loading()"
+    class="custom-table"
+  >
+    <ng-template pTemplate="body" let-row>
+      <div
+        class="bg-gray-900 border-x border-b border-gray-800 p-6 lg:p-4 lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center hover:bg-gray-850/50 transition cursor-pointer"
+        (click)="viewDetail.emit(row)"
+      >
+        <!-- Dynamic Row Columns -->
+        @for (col of columns(); track col.field; let i = $index) {
+          <div
+            [class]="i === 0 ? 'col-span-1' : i === 1 ? 'col-span-3' : 'col-span-2'"
+            class="mb-4 lg:mb-0"
+          >
+            <p class="text-gray-500 text-[10px] uppercase tracking-tighter mb-1 lg:hidden">
+              {{ col.header }}
+            </p>
+
+            <div class="text-gray-100 text-sm">
+              @switch (col.type) {
+                @case ('image') {
+                  <div
+                    class="w-12 h-12 rounded bg-gray-800 overflow-hidden flex items-center justify-center border border-gray-700"
+                  >
+                    <img
+                      [src]="getCloudinaryUrl(getCellValue(row, col))"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                }
+                @case ('badge') {
+                  <span
+                    class="bg-blue-900/30 text-blue-400 border border-blue-800/50 px-3 py-1 rounded-full text-[10px] font-bold uppercase"
+                  >
+                    {{ getCellValue(row, col) }}
+                  </span>
+                }
+                @case ('custom') {
+                  @if (customTemplates()[col.field]) {
+                    <ng-container
+                      *ngTemplateOutlet="customTemplates()[col.field]; context: { $implicit: row }"
+                    ></ng-container>
+                  }
+                }
+                @default {
+                  <span class="font-medium">{{ getCellValue(row, col) }}</span>
+                }
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="col-span-1 flex justify-end" (click)="$event.stopPropagation()">
+          <button
+            type="button"
+            class="p-2 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition"
+            (click)="activeMenuRow.set(row); op.toggle($event)"
+          >
+            <i class="pi pi-ellipsis-v"></i>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <div class="bg-gray-900 border-x border-b border-gray-800 p-12 text-center text-gray-500">
+        <i class="pi pi-inbox text-4xl mb-4 block"></i>
+        <p>No records found matching your filters.</p>
+      </div>
+    </ng-template>
+  </p-table>
+
+  <!-- Pagination Footer -->
+  <div
+    class="flex items-center justify-between mt-0 px-6 py-4 bg-gray-900 rounded-b-lg border border-gray-800"
+  >
+    <p class="text-gray-500 text-xs">
+      {{ serverFilter ? totalRecords : displayData().length }} listings
+    </p>
+    <div class="flex items-center gap-4">
+      <button
+        class="text-gray-500 cursor-pointer hover:text-gray-300 text-xs transition disabled:opacity-30"
+        [disabled]="!hasPrevious()"
+        (click)="previous()"
+      >
+        <i class="pi pi-chevron-left mr-1"></i> Previous
+      </button>
+      <span class="text-gray-600 text-[10px] font-bold uppercase tracking-widest">
+        Page {{ _currentPage() }}
+      </span>
+      <button
+        class="text-gray-500 cursor-pointer hover:text-gray-300 text-xs transition disabled:opacity-30"
+        [disabled]="!hasNext()"
+        (click)="next()"
+      >
+        Next <i class="pi pi-chevron-right ml-1"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Single Shared Popover for Row Actions -->
+<p-popover #op styleClass="custom-action-menu">
+  <div class="flex flex-col">
+    @for (action of getRowActions(activeMenuRow()); track action.label) {
+      <button
+        class="menu-item-btn"
+        [class.danger]="action.severity === 'danger'"
+        (click)="action.command(); op.hide()"
+      >
+        <i [class]="action.icon"></i>
+        <span>{{ action.label }}</span>
+      </button>
+    }
+  </div>
+</p-popover>

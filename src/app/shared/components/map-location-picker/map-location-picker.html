@@ -1,0 +1,41 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 p-4">
+  <div class="w-full max-w-3xl rounded-lg border border-gray-700 bg-gray-900 p-6 shadow-2xl flex flex-col h-[80vh]">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-gray-100">Select Location</h3>
+      <button type="button" (click)="onCancel()" class="text-gray-400 hover:text-white transition">
+        <i class="pi pi-times text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- Map Container -->
+    <div class="relative flex-1 w-full rounded-lg overflow-hidden border border-gray-800 bg-gray-800">
+      <div class="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex w-3/4 max-w-md gap-2">
+        <input 
+          type="text" 
+          id="mapSearchBox" 
+          placeholder="Search for a place..." 
+          class="flex-1 rounded-lg border border-gray-600 bg-white px-4 py-2 text-sm text-gray-900 shadow-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          (keydown.enter)="searchLocation()"
+        >
+        <button 
+          (click)="searchLocation()"
+          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-700"
+        >
+          Search
+        </button>
+      </div>
+      <div id="mapCanvas" class="h-full w-full relative z-[1]"></div>
+    </div>
+    
+    <!-- Info & Actions -->
+    <div class="mt-6 flex items-center justify-between">
+      <div class="text-sm text-gray-400 max-w-md truncate pr-4">
+        {{ selectedAddress || 'Drag the marker or click on the map to pick a location.' }}
+      </div>
+      <div class="flex gap-3">
+        <button type="button" (click)="onCancel()" class="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:bg-gray-700">Cancel</button>
+        <button type="button" (click)="onConfirm()" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">Confirm Location</button>
+      </div>
+    </div>
+  </div>
+</div>

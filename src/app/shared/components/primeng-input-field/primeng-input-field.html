@@ -1,0 +1,53 @@
+<div class="primeng-input-field">
+  <label *ngIf="label" [for]="id" class="mb-2 block text-sm font-semibold text-gray-300">{{ label }}</label>
+
+  <div class="relative">
+    <ng-container *ngIf="!isTextArea; else textareaField">
+      <input
+        pInputText
+        [id]="id"
+        [type]="inputType"
+        [value]="value"
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [ngClass]="{
+          'border-red-500 ring-red-500': invalid,
+          'border-gray-700 focus:ring-blue-600': !invalid
+        }"
+        class="w-full rounded-lg border bg-gray-800 px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out"
+        (input)="writeValueFromEvent($event)"
+        (blur)="onTouched()"
+      />
+    </ng-container>
+
+    <ng-template #textareaField>
+      <textarea
+        [id]="id"
+        [rows]="rows"
+        [value]="value"
+        [placeholder]="placeholder"
+        [disabled]="isDisabled"
+        [ngClass]="{
+          'border-red-500 ring-red-500': invalid,
+          'border-gray-700 focus:ring-blue-600': !invalid
+        }"
+        class="w-full rounded-lg border bg-gray-800 px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out resize-none"
+        (input)="writeValueFromEvent($event)"
+        (blur)="onTouched()"
+      ></textarea>
+    </ng-template>
+
+    <button
+      *ngIf="type === 'password'"
+      type="button"
+      class="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center rounded-full bg-gray-800 px-2 py-1 text-gray-400 transition hover:text-gray-100"
+      (click)="togglePasswordVisibility()"
+      [attr.aria-label]="isPasswordVisible ? 'Hide password' : 'Show password'"
+    >
+      <i class="pi" [ngClass]="isPasswordVisible ? 'pi-eye-slash' : 'pi-eye'"></i>
+    </button>
+  </div>
+
+  <p *ngIf="finalErrorMessage" class="mt-2 text-sm text-red-400">{{ finalErrorMessage }}</p>
+  <p *ngIf="!finalErrorMessage && helpText" class="mt-2 text-sm text-gray-400">{{ helpText }}</p>
+</div>

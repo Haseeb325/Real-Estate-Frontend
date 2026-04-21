@@ -7,8 +7,11 @@ import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputOtpModule } from 'primeng/inputotp';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import ToastModule from 'primeng/toast';
 
@@ -24,9 +27,12 @@ import ToastModule from 'primeng/toast';
     // PrimeNG
     CheckboxModule,
     ButtonModule,
+    InputGroupModule,
+    InputGroupAddonModule,
     InputOtpModule,
     TableModule,
     InputTextModule,
+    SelectModule,
     DatePickerModule,
   ]
 })
