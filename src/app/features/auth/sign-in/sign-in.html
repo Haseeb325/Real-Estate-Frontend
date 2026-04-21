@@ -3,14 +3,13 @@
   <div class="w-full max-w-md text-center">
 
     <!-- Logo -->
-    <div class="mb-10">
-      <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
-        <span class="text-pink-400 font-bold text-lg">P</span>
+    <div class="mb-4 text-center justify-center items-center gap-2 flex flex-col">
+        <!-- <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-pink-400/20">
+          <span class="text-lg font-bold text-pink-400">P</span>
+        </div> -->
+        <img class="h-36 w-36 justify-center items-center" src="assets/images/propify-removebg-preview.png" alt="">
+        <h1 class="text-3xl font-semibold tracking-widest text-gray-300">PROPIFY</h1>
       </div>
-      <h1 class="text-3xl tracking-widest text-gray-300 font-semibold">
-        PROPIFY
-      </h1>
-    </div>
 
     <!-- Form -->
     <form class="flex flex-col gap-6" [formGroup]="loginForm" (ngSubmit)="submitForm()">
