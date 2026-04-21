@@ -1,7 +1,9 @@
   <nav class="relative flex items-center justify-between px-4 py-4 md:px-12 bg-[#0f172a] border-b border-slate-800 z-50">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">🤖</div>
-      <span class="font-serif tracking-widest uppercase text-lg text-white">Propify</span>
+      <!-- <div class="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">🤖</div>
+        -->
+      <img class="h-10 w-10" src="assets/images/propify-removebg-preview.png" alt="">
+      <!-- <span class="font-serif tracking-widest uppercase text-lg text-white">Propify</span> -->
     </div>
 
     <div class="hidden md:flex items-center gap-4">
@@ -12,7 +14,11 @@
       }
       <!-- <button *ngIf="isAuthenticated()" class="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">{{user()?.email}}</button>
        -->
+      <div *ngIf="isAuthenticated()">
+      
       <div (click)="openProfile = true " class="w-[100px] rounded-full h-10  bg-blue-600 text-white flex items-center justify-center font-semibold cursor-pointer">
+        </div>
+      
   
 </div>
       <button *ngIf="isAuthenticated()" (click)="logout()" class="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Logout</button>
