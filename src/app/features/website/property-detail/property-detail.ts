@@ -56,7 +56,13 @@ export class PropertyDetail {
   //   ]);
   // }
 
-  showId(id: any) {
-    console.log(id);
+  onViewMap() {
+    const property = this.property();
+    if (!property) return;
+
+    // Use location_text for a natural search or coordinates if available
+    const query = property.location_text || property.location || property.title;
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(mapUrl, '_blank');
   }
 }

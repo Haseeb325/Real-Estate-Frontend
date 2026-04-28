@@ -1,0 +1,68 @@
+<div class="bg-gray-950 text-gray-100">
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gray-900 border-b-4 border-blue-600 px-4 md:px-8 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-2">
+          <div
+            class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-gray-400"
+          >
+            P
+          </div>
+          <span class="text-gray-500 text-xs font-semibold tracking-widest hidden sm:inline"
+            >PROFIFY</span
+          >
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex items-center gap-4 md:gap-8">
+          <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
+            >Home</a
+          >
+          <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
+            >Favourites</a
+          >
+          <button
+            class="bg-orange-500 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-orange-600 transition"
+          >
+            My Dashboard
+          </button>
+        </nav>
+
+        <!-- User Profile -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex flex-col items-end">
+            <span class="text-gray-100 text-sm font-semibold">Alex Morgan</span>
+            <span class="text-gray-500 text-xs">Buyer Account</span>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-rose-300 flex-shrink-0"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs Section -->
+    <div class="bg-gray-900 px-4 md:px-8 py-6 border-b border-gray-800">
+      <div class="max-w-7xl mx-auto flex gap-4">
+        <button
+          class="bg-gray-800 text-gray-300 px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition text-sm border border-gray-700"
+        >
+          Chats
+        </button>
+        <button
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm"
+        >
+          Appointments
+        </button>
+        <button
+          class="bg-gray-800 text-gray-300 px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition text-sm border border-gray-700"
+        >
+          Bookings
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <app-appointments></app-appointments>
+  </div>
+</div>

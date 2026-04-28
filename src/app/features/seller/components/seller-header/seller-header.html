@@ -13,21 +13,36 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex items-center gap-3 md:gap-8 flex-wrap">
-      <button
-        class="bg-orange-500 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-orange-600 transition"
+    <nav class="flex items-center gap-2 md:gap-4 flex-wrap bg-gray-950/50 p-1.5 rounded-2xl border border-gray-800/50 backdrop-blur-md">
+      <a
+        [routerLink]="['/seller/dashboard']"
+        routerLinkActive="bg-orange-600 text-white shadow-xl shadow-orange-900/30"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-gray-400 hover:text-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
       >
-        Listings
-      </button>
-      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
-        >Inquiries</a
+        Dashboard
+      </a>
+      <a
+        [routerLink]="['/seller/chats']"
+        routerLinkActive="bg-orange-600 text-white shadow-xl shadow-orange-900/30"
+        class="text-gray-400 hover:text-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 hidden md:inline-block"
       >
-      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
-        >Appointments</a
+        Inquiries
+      </a>
+      <a
+        [routerLink]="['/seller/appointments']"
+        routerLinkActive="bg-orange-600 text-white shadow-xl shadow-orange-900/30"
+        class="text-gray-400 hover:text-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 hidden md:inline-block"
       >
-      <a href="#" class="text-gray-400 hover:text-gray-200 text-sm transition hidden md:inline"
-        >Payment</a
+        Appointments
+      </a>
+      <a
+        [routerLink]="['/seller/payments']"
+        routerLinkActive="bg-orange-600 text-white shadow-xl shadow-orange-900/30"
+        class="text-gray-400 hover:text-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 hidden md:inline-block"
       >
+        Payment
+      </a>
     </nav>
 
     <!-- User Profile -->

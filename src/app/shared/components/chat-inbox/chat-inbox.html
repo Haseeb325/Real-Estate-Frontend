@@ -1,0 +1,55 @@
+<div class="chat-inbox">
+  <!-- Left Panel: Session List -->
+  <div class="inbox-sidebar">
+    <app-session-list
+      [sessions]="chatService.sessions()"
+      [activeSessionId]="chatService.activeSession()?.session_id ?? null"
+      [isLoading]="chatService.isLoading()"
+      (sessionSelected)="chatService.selectSession($event)"
+      [currentUserUsername]="chatService.currentUserUsername()"
+    />
+  </div>
+
+  <!-- Right Panel: Chat Area -->
+  <div class="inbox-chat">
+    <!-- Chat Header -->
+    @if (chatService.activeSession(); as session) {
+      @let other = chatService.otherParticipant();
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="header-avatar">
+            <span>{{ (other?.username || 'U')[0] | uppercase }}</span>
+          </div>
+          <div>
+            <p class="header-name">
+              {{ other?.full_name || other?.username || 'User' }}
+            </p>
+            <p class="header-property">{{ session.property.title || 'Property' }}</p>
+          </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status" [class]="chatService.connectionStatus()">
+          <span class="status-dot"></span>
+          {{ chatService.connectionStatus() | titlecase }}
+        </div>
+      </div>
+    }
+
+    <!-- Messages -->
+    <app-message-list
+      [messages]="chatService.messages()"
+      [currentUserId]="chatService.currentUserId()"
+      [currentUserUsername]="chatService.currentUserUsername()"
+      [activeSession]="chatService.activeSession()"
+      [isLoading]="chatService.isLoading()"
+    />
+
+    <!-- Input -->
+    <app-message-input
+      [disabled]="!chatService.activeSession()"
+      [connectionStatus]="chatService.connectionStatus()"
+      (messageSent)="chatService.sendMessage($event)"
+    />
+  </div>
+</div>

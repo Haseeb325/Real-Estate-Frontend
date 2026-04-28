@@ -42,4 +42,13 @@ export class URLConfig {
   public static sellerProfile = baseUrl + 'profile/seller';
   public static sellerDocs = baseUrl + 'profile/seller/docs';
   public static sellerAvailabilities = baseUrl + 'seller/availabilities/';
+
+  // Appointments & Availability
+  public static getPropertyAvailability = (id: any) =>
+    baseUrl + `properties/browse/${id}/availability/`;
+  public static appointments = baseUrl + 'appointments/';
+
+  public static confirmAppointment = (id: any) => `${baseUrl}appointments/${id}/confirm/`;
+  public static cancelAppointment = (id: any) => `${baseUrl}appointments/${id}/cancel/`;
+  public static completeAppointment = (id: any) => `${baseUrl}appointments/${id}/complete/`;
 }

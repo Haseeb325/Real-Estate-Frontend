@@ -1,0 +1,36 @@
+<div class="message-input-container">
+  <!-- Connection Status Indicator -->
+  @if (connectionStatus() === 'reconnecting') {
+    <div class="connection-banner reconnecting">
+      <span class="status-dot"></span>
+      Reconnecting...
+    </div>
+  } @else if (connectionStatus() === 'disconnected' && !disabled()) {
+    <div class="connection-banner disconnected">
+      <span class="status-dot"></span>
+      Disconnected
+    </div>
+  }
+
+  <!-- Input Row -->
+  <div class="input-row">
+    <input
+      type="text"
+      [(ngModel)]="messageText"
+      (keydown)="onKeyDown($event)"
+      placeholder="Type your message..."
+      class="text-input"
+      [disabled]="disabled()"
+    />
+
+    <button
+      class="send-button"
+      (click)="onSend()"
+      [disabled]="disabled() || !messageText.trim()"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="send-icon">
+        <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
+      </svg>
+    </button>
+  </div>
+</div>

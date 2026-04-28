@@ -1,0 +1,50 @@
+<div class="message-list-container" #scrollContainer>
+  @if (!activeSession()) {
+    <!-- No session selected -->
+    <div class="empty-state">
+      <div class="empty-icon">💬</div>
+      <h3>Select a conversation</h3>
+      <p>Choose a conversation from the sidebar to start messaging</p>
+    </div>
+  } @else if (isLoading()) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading messages...</p>
+    </div>
+  } @else if (messages().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">👋</div>
+      <h3>Start the conversation</h3>
+      <p>Send a message to begin chatting</p>
+    </div>
+  } @else {
+    @for (message of messages(); track message.id; let i = $index) {
+      <!-- Date Separator -->
+      @if (shouldShowDateSeparator(i)) {
+        <div class="date-separator">
+          <span>{{ formatDateSeparator(message.timestamp) }}</span>
+        </div>
+      }
+
+      <!-- Message Bubble -->
+      <div class="message-row" [class.own]="isOwnMessage(message)">
+        <!-- Message Avatar -->
+        <div class="message-avatar" [class.own]="isOwnMessage(message)">
+          <span>
+            {{ getAvatarInitial(message) }}
+          </span>
+        </div>
+
+        <div class="message-bubble" [class.own]="isOwnMessage(message)">
+          <p class="message-content">{{ message.content }}</p>
+          <span class="message-time">
+            {{ formatTime(message.timestamp) }}
+            @if (isOwnMessage(message)) {
+              <span class="read-status">{{ message.is_read ? '✓✓' : '✓' }}</span>
+            }
+          </span>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,115 @@
+.message-input-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 1.25rem;
+}
+
+// ── Connection Banners ──
+
+.connection-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+
+  &.reconnecting {
+    background: rgba(234, 179, 8, 0.1);
+    color: #eab308;
+
+    .status-dot {
+      background: #eab308;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  }
+
+  &.disconnected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+
+    .status-dot {
+      background: #ef4444;
+    }
+  }
+}
+
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+// ── Input Row ──
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.text-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &::placeholder {
+    color: #475569;
+  }
+
+  &:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.send-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.15s;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .send-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

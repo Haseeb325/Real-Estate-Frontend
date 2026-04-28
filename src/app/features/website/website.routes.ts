@@ -29,6 +29,14 @@ export const websiteRoutes: Routes = [
           roles: 'buyer',
         },
       },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
+        canActivate: [AuthGuard, RoleGuard],
+        data: {
+          roles: 'buyer',
+        },
+      },
     ],
   },
 ];

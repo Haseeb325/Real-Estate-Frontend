@@ -116,15 +116,22 @@
   <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 mt-6">
     <h3 class="font-semibold mb-3">Location</h3>
 
-    <div class="rounded-lg overflow-hidden">
-      <img src="/assets/images/map.jpg" class="w-full h-96 object-cover" alt="Map" />
+    <div class="rounded-lg overflow-hidden cursor-pointer group" (click)="onViewMap()">
+      <img
+        src="/assets/images/map.jpg"
+        class="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-700"
+        alt="Map"
+      />
     </div>
 
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-3">
       <p class="text-sm text-slate-400">
         {{ property()?.location_text }}
       </p>
-      <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm">
+      <button
+        (click)="onViewMap()"
+        class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-all active:scale-95"
+      >
         View on full map
       </button>
     </div>

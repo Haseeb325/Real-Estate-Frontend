@@ -1,0 +1,212 @@
+<main class="flex-1 px-4 md:px-8 py-8 bg-gray-950 min-h-screen">
+  <div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div>
+        <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Appointments</h1>
+        <p class="text-gray-400 text-base">Track and manage your property visits seamlessly.</p>
+      </div>
+
+      <!-- Professional Tabs -->
+      <div class="inline-flex bg-gray-900 p-1.5 rounded-2xl border border-gray-800 shadow-2xl">
+        <button
+          (click)="activeTab.set('upcoming')"
+          [class.bg-blue-600]="activeTab() === 'upcoming'"
+          [class.text-white]="activeTab() === 'upcoming'"
+          [class.shadow-lg]="activeTab() === 'upcoming'"
+          class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-300"
+        >
+          Upcoming
+          <span class="ml-1.5 opacity-50 font-medium">({{ store.upcoming().length }})</span>
+        </button>
+        <button
+          (click)="activeTab.set('completed')"
+          [class.bg-blue-600]="activeTab() === 'completed'"
+          [class.text-white]="activeTab() === 'completed'"
+          [class.shadow-lg]="activeTab() === 'completed'"
+          class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-300"
+        >
+          History
+          <span class="ml-1.5 opacity-50 font-medium">({{ store.completed().length }})</span>
+        </button>
+        <button
+          (click)="activeTab.set('cancelled')"
+          [class.bg-blue-600]="activeTab() === 'cancelled'"
+          [class.text-white]="activeTab() === 'cancelled'"
+          [class.shadow-lg]="activeTab() === 'cancelled'"
+          class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 text-gray-500 hover:text-gray-300"
+        >
+          Cancelled
+          <span class="ml-1.5 opacity-50 font-medium">({{ store.cancelled().length }})</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-32 space-y-4">
+        <div
+          class="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"
+        ></div>
+        <p class="text-gray-500 font-medium animate-pulse">Syncing your visits...</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (
+          appointment of activeTab() == 'upcoming'
+            ? store.upcoming()
+            : activeTab() == 'completed'
+              ? store.completed()
+              : store.cancelled();
+          track appointment.id
+        ) {
+          <div
+            class="bg-gray-900 rounded-[2rem] border border-gray-800 p-7 hover:border-gray-700 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-500 group relative overflow-hidden flex flex-col"
+          >
+            <!-- Glassy background effect -->
+            <div
+              class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/5 blur-[80px] rounded-full group-hover:bg-blue-600/10 transition-colors"
+            ></div>
+
+            <!-- Header Section -->
+            <div class="flex items-start justify-between mb-6 relative">
+              <div class="flex-1">
+                <h3
+                  class="text-gray-100 font-bold text-xl mb-2 group-hover:text-blue-400 transition-colors line-clamp-1"
+                >
+                  {{ appointment.property_title }}
+                </h3>
+                <div class="flex flex-wrap items-center gap-3 text-gray-400">
+                  <div
+                    class="flex items-center gap-1.5 text-xs font-medium bg-gray-800/50 px-2.5 py-1 rounded-lg"
+                  >
+                    <span>{{ appointment.start_time | date: 'MMM d, y' }}</span>
+                  </div>
+                  <div
+                    class="flex items-center gap-1.5 text-xs font-medium bg-gray-800/50 px-2.5 py-1 rounded-lg"
+                  >
+                    <span>{{ appointment.start_time | date: 'h:mm a' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Indicator -->
+              <div
+                [class]="
+                  'flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ' +
+                  (appointment.status === 'pending'
+                    ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                    : appointment.status === 'confirmed'
+                      ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                      : appointment.status === 'completed'
+                        ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                        : 'bg-rose-500/10 text-rose-500 border-rose-500/20')
+                "
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+                {{ appointment.status }}
+              </div>
+            </div>
+
+            <!-- Participant Info Box -->
+            <div
+              class="bg-gray-950/40 rounded-2xl p-4 mb-6 border border-gray-800/50 backdrop-blur-sm relative"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white text-sm font-black shadow-lg shadow-blue-900/40"
+                >
+                  {{
+                    (currentUser()?.role === 'seller'
+                      ? appointment.buyer_name
+                      : appointment.seller_name
+                    ).charAt(0) || 'U'
+                  }}
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">
+                    {{ currentUser()?.role === 'seller' ? 'Potential Buyer' : 'Property Seller' }}
+                  </p>
+                  <p class="text-gray-100 text-sm font-semibold">
+                    {{
+                      currentUser()?.role === 'seller'
+                        ? appointment.buyer_name
+                        : appointment.seller_name
+                    }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes Section -->
+            @if (appointment.notes) {
+              <div class="mb-8 flex-1">
+                <p class="text-gray-500 text-xs italic line-clamp-3 leading-relaxed">
+                  "{{ appointment.notes }}"
+                </p>
+              </div>
+            } @else {
+              <div class="flex-1"></div>
+            }
+
+            <!-- Action Area -->
+            <div class="flex flex-wrap gap-3 mt-auto relative pt-4 border-t border-gray-800/50">
+              @if (appointment.available_actions.includes('confirm')) {
+                <button
+                  (click)="onConfirm(appointment.id)"
+                  class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs transition-all duration-300 shadow-xl shadow-emerald-900/20 active:scale-95"
+                >
+                  Confirm Visit
+                </button>
+              }
+
+              @if (appointment.available_actions.includes('complete')) {
+                <button
+                  (click)="onComplete(appointment.id)"
+                  class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-xs transition-all duration-300 shadow-xl shadow-blue-900/20 active:scale-95"
+                >
+                  Mark as Completed
+                </button>
+              }
+
+              @if (appointment.available_actions.includes('cancel')) {
+                <button
+                  (click)="onCancel(appointment.id)"
+                  class="flex-1 bg-gray-800 hover:bg-rose-900/40 hover:text-rose-400 text-gray-400 py-3 rounded-xl font-bold text-xs transition-all duration-300 border border-gray-700 hover:border-rose-900/50 active:scale-95"
+                >
+                  Cancel
+                </button>
+              }
+
+              @if (
+                currentUser()?.role === 'buyer' &&
+                (appointment.status === 'pending' || appointment.status === 'confirmed')
+              ) {
+                <button
+                  (click)="onReschedule(appointment)"
+                  class="flex-1 bg-gray-800 hover:bg-amber-900/40 hover:text-amber-400 text-gray-400 py-3 rounded-xl font-bold text-xs transition-all duration-300 border border-gray-700 hover:border-amber-900/50 active:scale-95"
+                >
+                  Reschedule
+                </button>
+              }
+            </div>
+          </div>
+        } @empty {
+          <div
+            class="col-span-full py-32 flex flex-col items-center justify-center text-center opacity-40"
+          >
+            <div
+              class="w-24 h-24 bg-gray-900 rounded-3xl flex items-center justify-center mb-6 border border-gray-800 rotate-12 group-hover:rotate-0 transition-transform"
+            >
+              <span class="text-4xl">📭</span>
+            </div>
+            <h3 class="text-gray-300 font-bold text-2xl mb-2">Nothing here yet</h3>
+            <p class="text-gray-500 text-sm max-w-xs">
+              No {{ activeTab() }} appointments found in your records.
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</main>

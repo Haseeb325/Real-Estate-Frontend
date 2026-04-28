@@ -1,0 +1,66 @@
+<!-- Session List Header -->
+<div class="session-list-header">
+  <h2 class="session-list-title">Messages & Inquiries</h2>
+
+  <!-- Search -->
+  <div class="session-search">
+    <svg
+      class="search-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <input type="text" placeholder="Search conversations..." class="search-input" />
+  </div>
+</div>
+
+<!-- Sessions -->
+<div class="session-items">
+  @if (isLoading()) {
+    <div class="session-loading">
+      <div class="loading-spinner"></div>
+      <p>Loading conversations...</p>
+    </div>
+  } @else if (sessions().length === 0) {
+    <div class="session-empty">
+      <p>No conversations yet</p>
+    </div>
+  } @else {
+    @for (session of sessions(); track session.session_id) {
+      <div
+        class="session-item"
+        [class.active]="activeSessionId() === session.session_id"
+        (click)="onSelectSession(session)"
+      >
+        @let other = getOtherUser(session);
+        <div class="session-avatar">
+          <span class="avatar-initial">
+            {{ (other.username || 'U')[0] | uppercase }}
+          </span>
+        </div>
+
+        <div class="session-info">
+          <div class="session-top-row">
+            <span class="session-name">
+              {{ other.full_name || other.username || 'User' }}
+            </span>
+            <span class="session-time">{{ formatTime(session.last_message_time) }}</span>
+          </div>
+
+          <p class="session-property">{{ session.property.title || 'Property' }}</p>
+          <p class="session-preview">{{ session.last_message || 'No messages yet' }}</p>
+        </div>
+
+        @if (session.unread_count > 0) {
+          <span class="unread-badge">{{ session.unread_count }}</span>
+        }
+      </div>
+    }
+  }
+</div>

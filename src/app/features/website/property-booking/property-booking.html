@@ -18,77 +18,89 @@
             </div> -->
 
             <!-- 2. Chat Card -->
-            <div class="bg-gray-900 rounded-2xl border border-gray-800 shadow-xl overflow-hidden">
+            <div
+              class="bg-gray-900 rounded-2xl border border-gray-800 shadow-xl overflow-hidden flex flex-col"
+              style="height: 500px"
+            >
               <!-- Agent Header -->
               <div class="p-6 border-b border-gray-800 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                   <div
-                    class="w-12 h-12 rounded-full bg-gray-700 flex-shrink-0 border-2 border-gray-800 shadow-inner"
-                  ></div>
+                    class="w-12 h-12 rounded-full bg-gray-700 flex-shrink-0 border-2 border-gray-800 shadow-inner overflow-hidden flex items-center justify-center"
+                  >
+                    <span class="text-white text-xl font-bold">{{
+                      (selectedProperty()?.user?.username || 'S')[0] | uppercase
+                    }}</span>
+                  </div>
                   <div>
                     <h3 class="text-gray-100 font-bold">
-                      {{ selectedProperty()?.user?.username }}
+                      {{ selectedProperty()?.user?.username || 'Agent' }}
                     </h3>
                     <p class="text-gray-500 text-xs">
                       Listing agent • Typically responds in < 1 hour
                     </p>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <div
-                    class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
-                  ></div>
-                  <span class="text-gray-400 text-xs font-medium">Online now</span>
-                </div>
+
+                @if (chatService.activeSession()) {
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="w-2.5 h-2.5 rounded-full"
+                      [class.bg-green-500]="chatService.connectionStatus() === 'connected'"
+                      [class.bg-yellow-500]="
+                        chatService.connectionStatus() === 'connecting' ||
+                        chatService.connectionStatus() === 'reconnecting'
+                      "
+                      [class.bg-red-500]="chatService.connectionStatus() === 'disconnected'"
+                    ></div>
+                    <span class="text-gray-400 text-xs font-medium">{{
+                      chatService.connectionStatus() | titlecase
+                    }}</span>
+                  </div>
+                }
               </div>
 
-              <!-- Message Area -->
-              <div class="p-6 space-y-6 min-h-[300px]">
-                <div class="flex justify-center">
-                  <span class="text-gray-600 text-xs font-bold uppercase tracking-widest"
-                    >Today</span
-                  >
-                </div>
-
-                <!-- Buyer Message -->
-                <div class="flex justify-end">
+              <!-- Message Area / Start Chat Button -->
+              @if (!chatService.activeSession()) {
+                <div class="flex-1 flex flex-col items-center justify-center p-6 space-y-4">
                   <div
-                    class="bg-blue-600 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[80%] shadow-lg"
+                    class="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-500 text-2xl"
                   >
-                    <p class="text-sm">Hi Daneil is property available for viewing on week</p>
-                    <p class="text-[10px] text-blue-200 mt-1 text-right">08:50</p>
+                    💬
                   </div>
-                </div>
-
-                <!-- Agent Message -->
-                <div class="flex justify-start">
-                  <div
-                    class="bg-gray-800 text-gray-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-[80%] border border-gray-700 shadow-lg"
-                  >
-                    <p class="text-sm">
-                      Yes Available, On Saturday Evening available for viewing the apartment. Below
-                      is location i have send to you.
-                    </p>
-                    <p class="text-[10px] text-gray-500 mt-1">09:32</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Input Area -->
-              <div class="p-4 bg-gray-900/50 border-t border-gray-800">
-                <div class="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="Type a message to seller..."
-                    class="flex-1 bg-gray-800/50 border border-gray-700 text-gray-100 rounded-xl px-4 py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm transition-all"
-                  />
+                  <h3 class="text-lg font-bold text-gray-100">Have questions?</h3>
+                  <p class="text-sm text-gray-400 text-center max-w-xs">
+                    Send a message to the agent to ask about this property.
+                  </p>
                   <button
-                    class="bg-blue-600 text-white rounded-xl px-5 py-3 hover:bg-blue-700 transition-all shadow-lg hover:scale-105 active:scale-95"
+                    (click)="startChat()"
+                    [disabled]="chatService.isLoading()"
+                    class="mt-4 bg-blue-600 text-white rounded-xl px-6 py-3 font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center gap-2"
                   >
-                    <i class="pi pi-send"></i>
+                    @if (chatService.isLoading()) {
+                      <div
+                        class="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"
+                      ></div>
+                    }
+                    Contact Seller
                   </button>
                 </div>
-              </div>
+              } @else {
+                <app-message-list
+                  class="flex-1 overflow-hidden"
+                  [messages]="chatService.messages()"
+                  [currentUserId]="chatService.currentUserId()"
+                  [currentUserUsername]="chatService.currentUserUsername()"
+                  [activeSession]="chatService.activeSession()"
+                  [isLoading]="chatService.isLoading()"
+                />
+
+                <app-message-input
+                  [disabled]="!chatService.activeSession()"
+                  [connectionStatus]="chatService.connectionStatus()"
+                  (messageSent)="chatService.sendMessage($event)"
+                />
+              }
             </div>
 
             <!-- 3. Schedule Visit Card -->
@@ -110,19 +122,21 @@
                   <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">
                     Choose a date
                   </p>
-                  <div class="flex gap-3">
-                    <button
-                      class="bg-orange-500 text-white px-5 py-3 rounded-2xl shadow-lg shadow-orange-900/20 flex flex-col items-center min-w-[80px]"
-                    >
-                      <span class="text-xs font-bold uppercase opacity-80">Thu</span>
-                      <span class="text-lg font-black">24 Oct</span>
-                    </button>
-                    <button
-                      class="bg-gray-800 text-gray-400 border border-gray-700 px-5 py-3 rounded-2xl hover:bg-gray-700 transition-all flex flex-col items-center min-w-[80px]"
-                    >
-                      <span class="text-xs font-bold uppercase opacity-80">Fri</span>
-                      <span class="text-lg font-black">25 Oct</span>
-                    </button>
+                  @if (availableDates().length === 0) {
+                    <p class="text-sm text-gray-500">No available dates.</p>
+                  }
+                  <div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+                    @for (date of availableDates(); track date.date) {
+                      <button
+                        (click)="selectDate(date)"
+                        [class]="selectedDate()?.date === date.date 
+                          ? 'bg-orange-500 text-white px-5 py-3 rounded-2xl shadow-lg shadow-orange-900/20 flex flex-col items-center min-w-[80px] flex-shrink-0'
+                          : 'bg-gray-800 text-gray-400 border border-gray-700 px-5 py-3 rounded-2xl hover:bg-gray-700 transition-all flex flex-col items-center min-w-[80px] flex-shrink-0'"
+                      >
+                        <span class="text-xs font-bold uppercase opacity-80">{{ date.dayShort }}</span>
+                        <span class="text-lg font-black">{{ date.dayNum }} {{ date.monthShort }}</span>
+                      </button>
+                    }
                   </div>
                 </div>
 
@@ -131,30 +145,34 @@
                   <p class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">
                     Available Slots
                   </p>
-                  <div class="flex gap-2 flex-wrap">
-                    <button
-                      class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-all"
-                    >
-                      10:00
-                    </button>
-                    <button
-                      class="px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-900/20"
-                    >
-                      11:00
-                    </button>
-                    <button
-                      class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-all"
-                    >
-                      12:00
-                    </button>
+                  @if (availableSlots().length === 0) {
+                    <p class="text-sm text-gray-500">Please select a valid date.</p>
+                  }
+                  <div class="flex gap-2 flex-wrap max-h-40 overflow-y-auto custom-scrollbar">
+                    @for (slot of availableSlots(); track slot) {
+                      <button
+                        (click)="selectSlot(slot)"
+                        [class]="selectedSlot() === slot
+                          ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-900/20'
+                          : 'px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-all'"
+                      >
+                        {{ slot }}
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
 
               <button
-                class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-blue-900/20 mt-4 active:scale-[0.98]"
+                (click)="confirmVisit()"
+                [disabled]="isBooking() || !selectedDate() || !selectedSlot()"
+                class="w-full bg-blue-700 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-blue-900/20 mt-4 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Confirm visit
+                @if (isBooking()) {
+                  <i class="pi pi-spinner animate-spin"></i> Booking...
+                } @else {
+                  Confirm visit
+                }
               </button>
             </div>
           </div>
@@ -178,9 +196,7 @@
                   <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">
                     Total amount
                   </p>
-                  <p class="text-3xl font-black text-white">
-                    {{ getFormattedPrice() }} PKR
-                  </p>
+                  <p class="text-3xl font-black text-white">{{ getFormattedPrice() }} PKR</p>
                 </div>
 
                 <button

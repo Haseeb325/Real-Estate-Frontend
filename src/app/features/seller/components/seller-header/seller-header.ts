@@ -3,10 +3,11 @@ import { PopupBackdrop } from '../../../../components/popup-backdrop/popup-backd
 import { SellerProfile } from '../seller-profile/seller-profile';
 import { SellerProfileService } from './seller.profile.service';
 import { Shared } from '../../../../shared/shared.module';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-seller-header',
-  imports: [PopupBackdrop, SellerProfile, Shared],
+  imports: [PopupBackdrop, SellerProfile, Shared, RouterLink],
   templateUrl: './seller-header.html',
   styleUrl: './seller-header.scss',
 })
