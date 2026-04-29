@@ -1,10 +1,12 @@
-import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { WebSiteService } from '../website.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageList } from '../../../shared/components/chat-inbox/message-list/message-list';
 import { MessageInput } from '../../../shared/components/chat-inbox/message-input/message-input';
+import { PaymentStore } from '../../../shared/stores/paymentStore';
+import { FormsModule } from '@angular/forms';
 
 export interface AvailabilityRule {
   id: string;
@@ -25,7 +27,7 @@ export interface AvailableDate {
 @Component({
   selector: 'app-property-booking',
   standalone: true,
-  imports: [CommonModule, MessageList, MessageInput],
+  imports: [CommonModule, MessageList, MessageInput, FormsModule],
   templateUrl: './property-booking.html',
   styleUrl: './property-booking.scss',
   providers: [DatePipe],
@@ -48,6 +50,25 @@ export class PropertyBooking implements OnInit, OnDestroy {
   selectedDate = signal<AvailableDate | null>(null);
   selectedSlot = signal<string | null>(null);
   isBooking = signal(false);
+
+  // Payment/Rent Fields
+  paymentStore = inject(PaymentStore);
+  rentMonths = signal<number>(6);
+  rentStartDate = signal<string>(new Date().toISOString().split('T')[0]);
+  isProcessingPayment = this.paymentStore.isLoading;
+
+  totalPayNow = computed(() => {
+    const property = this.selectedProperty();
+    if (!property) return 0;
+
+    if (this.purchaseType === 'Rent') {
+      const rent = parseFloat(property.rent_price || '0') || 0;
+      const deposit = parseFloat(property.security_deposit || '0') || 0;
+      return rent + deposit;
+    }
+
+    return parseFloat(property.sale_price || '0') || 0;
+  });
 
   ngOnInit() {
     if (this.id) {
@@ -172,6 +193,37 @@ export class PropertyBooking implements OnInit, OnDestroy {
         alert(err.error?.message || err.error?.time_error || 'Failed to confirm visit.');
       },
     });
+  }
+
+  async confirmBooking() {
+    const property: any = this.selectedProperty();
+    if (!property) return;
+
+    const payload: any = {
+      property_id: property.id,
+      payment_type: this.purchaseType === 'Buy' ? 'sale' : 'initial_rent',
+    };
+
+    if (this.purchaseType === 'rent') {
+      if (!this.rentStartDate()) {
+        this.paymentStore.toastService.error('Please select a move-in date.');
+        return;
+      }
+      if (!this.rentMonths()) {
+        this.paymentStore.toastService.error('Please select the rental duration.');
+        return;
+      }
+      payload.months = this.rentMonths();
+      payload.start_date = this.rentStartDate();
+    }
+
+    try {
+      await this.paymentStore.processPayment(payload);
+      // Success is handled by the store (toast + data refresh)
+      this.router.navigate(['/dashboard/bookings']);
+    } catch (err) {
+      // Error handled by store toast
+    }
   }
 
   getFormattedPrice(): string {

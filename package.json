@@ -21,6 +21,8 @@
     "apexcharts": "^5.10.6",
     "bootstrap": "^5.3.8",
     "intl-tel-input": "^26.8.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "leaflet": "^1.9.4",
     "ng-apexcharts": "^2.4.0",
     "ngx-bootstrap": "^21.0.1",

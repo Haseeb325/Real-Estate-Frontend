@@ -1,11 +1,32 @@
 import { Component } from '@angular/core';
-import { ChatInbox } from '../../../shared/components/chat-inbox/chat-inbox';
-import { Appointments } from '../../../shared/components/appointments/appointments';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ChatInbox, Appointments],
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {}
+export class Dashboard {
+  tabs = [
+    {
+      label: 'Chats',
+      icon: 'chat',
+      routerLink: '.', // Use '.' for the default child path
+      exact: true
+    },
+    {
+      label: 'Appointments',
+      icon: 'calendar',
+      routerLink: 'appointments',
+      exact: false
+    },
+    {
+      label: 'Bookings',
+      icon: 'building',
+      routerLink: 'bookings',
+      exact: false
+    },
+  ];
+}

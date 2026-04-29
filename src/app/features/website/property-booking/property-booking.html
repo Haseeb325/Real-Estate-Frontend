@@ -129,12 +129,18 @@
                     @for (date of availableDates(); track date.date) {
                       <button
                         (click)="selectDate(date)"
-                        [class]="selectedDate()?.date === date.date 
-                          ? 'bg-orange-500 text-white px-5 py-3 rounded-2xl shadow-lg shadow-orange-900/20 flex flex-col items-center min-w-[80px] flex-shrink-0'
-                          : 'bg-gray-800 text-gray-400 border border-gray-700 px-5 py-3 rounded-2xl hover:bg-gray-700 transition-all flex flex-col items-center min-w-[80px] flex-shrink-0'"
+                        [class]="
+                          selectedDate()?.date === date.date
+                            ? 'bg-orange-500 text-white px-5 py-3 rounded-2xl shadow-lg shadow-orange-900/20 flex flex-col items-center min-w-[80px] flex-shrink-0'
+                            : 'bg-gray-800 text-gray-400 border border-gray-700 px-5 py-3 rounded-2xl hover:bg-gray-700 transition-all flex flex-col items-center min-w-[80px] flex-shrink-0'
+                        "
                       >
-                        <span class="text-xs font-bold uppercase opacity-80">{{ date.dayShort }}</span>
-                        <span class="text-lg font-black">{{ date.dayNum }} {{ date.monthShort }}</span>
+                        <span class="text-xs font-bold uppercase opacity-80">{{
+                          date.dayShort
+                        }}</span>
+                        <span class="text-lg font-black"
+                          >{{ date.dayNum }} {{ date.monthShort }}</span
+                        >
                       </button>
                     }
                   </div>
@@ -152,9 +158,11 @@
                     @for (slot of availableSlots(); track slot) {
                       <button
                         (click)="selectSlot(slot)"
-                        [class]="selectedSlot() === slot
-                          ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-900/20'
-                          : 'px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-all'"
+                        [class]="
+                          selectedSlot() === slot
+                            ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-orange-900/20'
+                            : 'px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-400 hover:text-gray-200 transition-all'
+                        "
                       >
                         {{ slot }}
                       </button>
@@ -187,22 +195,79 @@
                 <i class="pi pi-shield text-gray-600 text-xl"></i>
               </div>
 
-              <div class="space-y-6">
+              <div class="space-y-5">
                 <p class="text-gray-500 text-sm leading-relaxed">
                   Reserve this property with secure payment protection.
                 </p>
 
-                <div class="bg-gray-800/50 p-4 rounded-2xl border border-gray-800">
+                <!-- Rent specific fields -->
+                @if (purchaseType === 'rent') {
+                  <div class="space-y-4 pt-2">
+                    <div>
+                      <label
+                        class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block flex items-center justify-between"
+                      >
+                        <span>Rental Duration (Months) <span class="text-red-500">*</span></span>
+                      </label>
+                      <select
+                        [ngModel]="rentMonths()"
+                        (ngModelChange)="rentMonths.set($event)"
+                        required
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-all cursor-pointer"
+                      >
+                        <option [value]="null" disabled>Select duration</option>
+                        <option [value]="3">3 Months</option>
+                        <option [value]="6">6 Months</option>
+                        <option [value]="12">12 Months</option>
+                        <option [value]="24">24 Months</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label
+                        class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2 block flex items-center justify-between"
+                      >
+                        <span>Move-in Date <span class="text-red-500">*</span></span>
+                      </label>
+                      <input
+                        type="date"
+                        [ngModel]="rentStartDate()"
+                        (ngModelChange)="rentStartDate.set($event)"
+                        required
+                        class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+                }
+
+                <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-800">
                   <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-1">
-                    Total amount
+                    {{ purchaseType === 'Rent' ? 'Total to pay now' : 'Total Price' }}
                   </p>
-                  <p class="text-3xl font-black text-white">{{ getFormattedPrice() }} PKR</p>
+                  <p class="text-3xl font-black text-white">
+                    {{ totalPayNow() | number }}
+                    PKR
+                  </p>
+                  @if (purchaseType === 'Rent') {
+                    <p class="text-[10px] text-gray-500 mt-1 font-medium">
+                      Includes 1st month rent + security deposit
+                    </p>
+                  }
                 </div>
 
                 <button
-                  class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/30 active:scale-[0.98]"
+                  (click)="confirmBooking()"
+                  [disabled]="isProcessingPayment()"
+                  class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-xl shadow-blue-900/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-3"
                 >
-                  Continue to payment
+                  @if (isProcessingPayment()) {
+                    <div
+                      class="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"
+                    ></div>
+                    Processing...
+                  } @else {
+                    Confirm & Pay
+                  }
                 </button>
               </div>
             </div>

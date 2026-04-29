@@ -36,6 +36,21 @@ export const websiteRoutes: Routes = [
         data: {
           roles: 'buyer',
         },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./dashboard/chats/chats').then((m) => m.Chats),
+          },
+          {
+            path: 'appointments',
+            loadComponent: () =>
+              import('./dashboard/appointments/appointments').then((m) => m.Appointments),
+          },
+          {
+            path: 'bookings',
+            loadComponent: () => import('./dashboard/bookings/bookings').then((m) => m.Bookings),
+          },
+        ],
       },
     ],
   },

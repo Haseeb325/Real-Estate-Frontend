@@ -51,4 +51,9 @@ export class URLConfig {
   public static confirmAppointment = (id: any) => `${baseUrl}appointments/${id}/confirm/`;
   public static cancelAppointment = (id: any) => `${baseUrl}appointments/${id}/cancel/`;
   public static completeAppointment = (id: any) => `${baseUrl}appointments/${id}/complete/`;
+
+  // Payments & Rentals
+  public static processPayment = baseUrl + 'payments/process/';
+  public static rentalAgreements = baseUrl + 'rental-agreements/';
+  public static paymentHistory = baseUrl + 'payments/';
 }

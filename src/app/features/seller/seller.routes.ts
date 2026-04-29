@@ -39,6 +39,10 @@ export const sellerRoutes: Routes = [
         loadComponent: () =>
           import('../../shared/components/appointments/appointments').then((m) => m.Appointments),
       },
+      {
+        path: 'payments',
+        loadComponent: () => import('./payments/payments').then((m) => m.SellerPayments),
+      },
     ],
   },
 ];
