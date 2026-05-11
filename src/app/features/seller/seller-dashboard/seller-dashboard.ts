@@ -24,7 +24,7 @@ export class SellerDashboard {
   selectedPropertyId = signal<string | null>(null);
   showAvailabilityPopup = signal(false);
 
-  activeCount = computed(() => this.stats()?.data.filter((p: any) => p.is_verified).length || 0);
+  activeCount = computed(() => this.stats()?.data.filter((p: any) => p.status === 'active').length || 0);
   totalCount = computed(() => this.stats()?.count || 0);
 
   // Define Columns
@@ -141,46 +141,54 @@ export class SellerDashboard {
   }
 
   rowActions = (row: any): TableAction[] => {
-    return [
-      {
-        ...viewButton,
-        command: () => {
-          this.router.navigate(['/seller/property', row.id]);
+    try {
+      if (!row) return [];
+      return [
+        {
+          ...viewButton,
+          command: () => {
+            this.router.navigate(['/seller/property', row.id]);
+          },
         },
-      },
-      {
-        ...editButton,
-        command: () => {
-          this.router.navigate(['/seller/edit-property', row.id]);
+        {
+          ...editButton,
+          disabled: (row) => row?.status === 'sold',
+          command: () => {
+            this.router.navigate(['/seller/edit-property', row.id]);
+          },
         },
-      },
-      {
-        icon: 'pi pi-calendar',
-        label: 'Set Availability',
-        class: 'text-blue-500',
-        command: () => {
-          this.selectedPropertyId.set(row.id);
-          this.showAvailabilityPopup.set(true);
+        {
+          icon: 'pi pi-calendar',
+          label: 'Set Availability',
+          class: 'text-blue-500',
+          disabled: (row) => row?.status === 'sold',
+          command: () => {
+            this.selectedPropertyId.set(row.id);
+            this.showAvailabilityPopup.set(true);
+          },
         },
-      },
-      {
-        ...deleteButton,
-        command: async () => {
-          this.dashboardService.loading.set(true);
-          await firstValueFrom(this.apiService.delete(URLConfig.deleteSellerProperty(row.id)))
-            .then((res: any) => {
-              this.toastService.success(res);
-            })
-            .catch((error: any) => {
-              this.toastService.error(error);
-            })
-            .finally(() => {
-              this.loadProperties(true);
-              this.loadStat();
-            });
+        {
+          ...deleteButton,
+          command: async () => {
+            this.dashboardService.loading.set(true);
+            await firstValueFrom(this.apiService.delete(URLConfig.deleteSellerProperty(row.id)))
+              .then((res: any) => {
+                this.toastService.success(res);
+              })
+              .catch((error: any) => {
+                this.toastService.error(error);
+              })
+              .finally(() => {
+                this.loadProperties(true);
+                this.loadStat();
+              });
+          },
         },
-      },
-    ];
+      ];
+    } catch (error) {
+      console.error('Error in rowActions:', error, row);
+      return [];
+    }
   };
   private router = inject(Router);
   private toastService = inject(ToastService);
