@@ -161,6 +161,7 @@ export class SellerDashboard {
       },
       {
         ...editButton,
+        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
         command: () => {
           this.router.navigate(['/seller/edit-property', row.id]);
         },
@@ -169,6 +170,7 @@ export class SellerDashboard {
         icon: 'pi pi-calendar',
         label: 'Set Availability',
         class: 'text-blue-500',
+        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
         command: () => {
           this.selectedPropertyId.set(row.id);
           this.showAvailabilityPopup.set(true);
@@ -176,6 +178,7 @@ export class SellerDashboard {
       },
       {
         ...deleteButton,
+        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
         command: async () => {
           this.dashboardService.loading.set(true);
           await firstValueFrom(this.apiService.delete(URLConfig.deleteSellerProperty(row.id)))
@@ -193,6 +196,7 @@ export class SellerDashboard {
       },
       {
         ...this.checkIfPauseOrActive(row),
+        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
         visible: (r: any) => row.status === 'active' || row.status === 'pause',
         command: () => {
           if (row.status === 'pause') {
