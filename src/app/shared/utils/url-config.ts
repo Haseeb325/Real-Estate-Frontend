@@ -37,6 +37,14 @@ export class URLConfig {
     return baseUrl + `properties/${id}`;
   };
 
+  public static pauseSellerProperty = (id: any) => {
+    return baseUrl + `properties/${id}/pause/`;
+  };
+
+  public static reactivateSellerProperty = (id: any) => {
+    return baseUrl + `properties/${id}/reactivate/`;
+  };
+
   public static getCurrentUser = baseUrl + 'get-current-user';
 
   public static sellerProfile = baseUrl + 'profile/seller';
@@ -56,4 +64,35 @@ export class URLConfig {
   public static processPayment = baseUrl + 'payments/process/';
   public static rentalAgreements = baseUrl + 'rental-agreements/';
   public static paymentHistory = baseUrl + 'payments/';
+
+  // admin urls
+  public static getDashboardStats = baseUrl + 'admin/stats';
+  public static propertiesStats = baseUrl + 'admin/properties/stats';
+  public static paymentStats = baseUrl + 'admin/finance/stats';
+  public static getAllUsers = baseUrl + 'admin/users';
+
+  public static suspendUser = (id: any) => `${baseUrl}admin/users/${id}/suspend/`;
+  public static activateUser = (id: any) => `${baseUrl}admin/users/${id}/activate/`;
+
+  public static getAllPropertiesByAdmin = baseUrl + 'admin/properties';
+  public static getSpecificPropertyByAdmin = (id: any) => `${baseUrl}admin/properties/${id}/`;
+
+  public static inactivePropertyByAdmin = (id: any) => {
+    return baseUrl + `admin/properties/${id}/suspend/`;
+  };
+  public static reactivatePropertyByAdmin = (id: any) => {
+    return baseUrl + `admin/properties/${id}/activate/`;
+  };
+
+  // Verification Endpoints
+  public static verifyProperty = (id: any) => `${baseUrl}admin/properties/${id}/verify/`;
+  public static rejectPropertyVerification = (id: any) =>
+    `${baseUrl}admin/properties/${id}/reject_verification/`;
+  public static getAdminSellerVerifications = () => `${baseUrl}admin/verifications/sellers/`;
+  public static getPendingPropertiesVerifications = () => `${baseUrl}admin/properties`;
+
+  // Finance URLs
+
+  public static getSalesTransactions = baseUrl + 'admin/finance/sales';
+  public static getRentalTransactions = baseUrl + 'admin/finance/rentals';
 }

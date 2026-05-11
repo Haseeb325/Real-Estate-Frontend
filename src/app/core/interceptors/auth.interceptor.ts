@@ -1,5 +1,11 @@
 import { inject, Injector, runInInjectionContext } from '@angular/core';
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpInterceptorFn,
+  HttpRequest,
+  HttpHandlerFn,
+  HttpEvent,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../../features/auth/auth.service';
@@ -21,10 +27,10 @@ const refreshSubject = new BehaviorSubject<boolean | null>(null);
 //       }
 
 //       // Don't refresh if the error happened on an auth-related URL
-      // const isAuthUrl = ['/forgot-password', '/sign-in'].some(url => req.url.includes(url));
+// const isAuthUrl = ['/forgot-password', '/sign-in'].some(url => req.url.includes(url));
 //       if (error.status === 401 && !isAuthUrl) {
 //         // Fix NG0203: Provide context for services using inject()
-//         const authService = runInInjectionContext(injector, () => 
+//         const authService = runInInjectionContext(injector, () =>
 //           injector.get(AuthService)
 //         );
 //         return handle401Error(clonedReq, next, authService);
@@ -40,24 +46,28 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req.clone({ withCredentials: true })).pipe(
     catchError((error: HttpErrorResponse) => {
       if (req.url.includes('/refresh-access-token')) return throwError(() => error);
-       const isAuthUrl = ['/forgot-password', '/sign-in'].some(url => req.url.includes(url));
+      const isAuthUrl = ['/forgot-password', '/sign-in'].some((url) => req.url.includes(url));
 
       if (error.status === 401 && !isAuthUrl) {
         // Breaking the loop: Get AuthService only on error
-        const authService = injector.get(AuthService); 
+        const authService = injector.get(AuthService);
         return handle401Error(req, next, authService);
       }
       return throwError(() => error);
-    })
+    }),
   );
 };
 
-function handle401Error(req: HttpRequest<any>, next: HttpHandlerFn, authService: AuthService): Observable<HttpEvent<any>> {
+function handle401Error(
+  req: HttpRequest<any>,
+  next: HttpHandlerFn,
+  authService: AuthService,
+): Observable<HttpEvent<any>> {
   if (isRefreshing) {
     return refreshSubject.pipe(
-      filter(val => val === true),
+      filter((val) => val === true),
       take(1),
-      switchMap(() => next(req))
+      switchMap(() => next(req)),
     );
   }
 
@@ -75,15 +85,9 @@ function handle401Error(req: HttpRequest<any>, next: HttpHandlerFn, authService:
       refreshSubject.next(false);
       authService.logoutUser();
       return throwError(() => err);
-    })
+    }),
   );
 }
-
-
-
-
-
-
 
 // import { HTTP_INTERCEPTORS } from '@angular/common/http';
 // import { AuthInterceptor } from './auth.interceptor';

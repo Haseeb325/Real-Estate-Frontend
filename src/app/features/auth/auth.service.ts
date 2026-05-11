@@ -213,10 +213,12 @@ export class AuthService {
         this.tempToken.set(null);
         this.authStore.setToken(response.data.access);
         this.authStore.setUser(response.data.user);
-        if (response.data.user.role === 'buyer' || response.data.user.role === 'admin') {
+        if (response.data.user.role === 'buyer') {
           this.router.navigate(['/landing']);
         } else if (response.data.user.role === 'seller') {
           this.router.navigate(['/seller']);
+        } else if (response.data.user.role === 'admin') {
+          this.router.navigate(['/admin']);
         }
       }),
       map((response: any) => response.data),

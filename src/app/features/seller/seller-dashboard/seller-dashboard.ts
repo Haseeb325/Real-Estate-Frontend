@@ -4,7 +4,17 @@ import { Shared } from '../../../shared/shared.module';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../../shared/api.service';
 import { URLConfig } from '../../../shared/utils/url-config';
-import { ColumnDef, DataTable, FilterDef, TableAction, deleteButton, editButton, viewButton } from '../../../shared/components/data-table/data-table';
+import {
+  ColumnDef,
+  DataTable,
+  FilterDef,
+  TableAction,
+  activateButton,
+  deleteButton,
+  editButton,
+  pauseButton,
+  viewButton,
+} from '../../../shared/components/data-table/data-table';
 import { DashboardService } from './dashboard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { SellerAvailability } from '../components/seller-availability/seller-availability';
@@ -97,7 +107,7 @@ export class SellerDashboard {
         { id: 'active', label: 'Active' },
         { id: 'pending', label: 'Pending' },
         { id: 'rejected', label: 'Rejected' },
-        { id: 'paused', label: 'Paused' },
+        { id: 'pause', label: 'Paused' },
         { id: 'sold', label: 'Sold' },
       ],
     },
@@ -141,6 +151,7 @@ export class SellerDashboard {
   }
 
   rowActions = (row: any): TableAction[] => {
+    if (!row) return [];
     return [
       {
         ...viewButton,
@@ -180,6 +191,17 @@ export class SellerDashboard {
             });
         },
       },
+      {
+        ...this.checkIfPauseOrActive(row),
+        visible: (r: any) => row.status === 'active' || row.status === 'pause',
+        command: () => {
+          if (row.status === 'pause') {
+            this.reactivateProperty(row.id);
+          } else if (row.status === 'active') {
+            this.pauseProperty(row.id);
+          }
+        },
+      },
     ];
   };
   private router = inject(Router);
@@ -214,5 +236,46 @@ export class SellerDashboard {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  pauseProperty(id: any) {
+    this.dashboardService.loading.set(true);
+    this.apiService.post(URLConfig.pauseSellerProperty(id), {}).subscribe({
+      next: (res: any) => {
+        this.toastService.success(res.message);
+      },
+      error: (err) => {
+        this.toastService.error(err.message || err || 'Something went wrong');
+      },
+      complete: () => {
+        this.loadProperties(true);
+        this.loadStat();
+        this.dashboardService.loading.set(false);
+      },
+    });
+  }
+
+  reactivateProperty(id: any) {
+    this.apiService.post(URLConfig.reactivateSellerProperty(id), {}).subscribe({
+      next: (res: any) => {
+        this.toastService.success(res.message);
+      },
+      error: (err) => {
+        this.toastService.error(err.message || err || 'Something went wrong');
+      },
+      complete: () => {
+        this.loadProperties(true);
+        this.loadStat();
+      },
+    });
+  }
+
+  checkIfPauseOrActive(row: any) {
+    if (row.status === 'pause') {
+      return activateButton;
+    } else if (row.status === 'active') {
+      return pauseButton;
+    }
+    return { visible: (r: any) => false };
   }
 }

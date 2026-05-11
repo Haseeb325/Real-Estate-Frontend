@@ -16,6 +16,7 @@ import { signal } from '@angular/core';
 import { getCloudinaryUrl } from '../../utils/common-utils';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TooltipModule } from 'primeng/tooltip';
 
 export interface ColumnDef<T = any> {
   field: string;
@@ -25,6 +26,8 @@ export interface ColumnDef<T = any> {
   link?: string | ((row: T) => any);
   type?: 'text' | 'number' | 'date' | 'custom' | 'routerLink' | 'badge' | 'image';
   value?: (row: T) => any;
+  colSpan?: number;
+  width?: string;
 }
 
 export interface TableAction<T = any> {
@@ -73,6 +76,28 @@ export const viewButton: TableAction = {
   },
 };
 
+export const pauseButton: TableAction = {
+  label: 'Pause',
+  icon: 'pi pi-pause',
+  severity: 'warn',
+  buttonType: 'text',
+  size: 'small',
+  command: (row: any) => {
+    console.log(row);
+  },
+};
+
+export const activateButton: TableAction = {
+  label: 'Activate',
+  icon: 'pi pi-play',
+  severity: 'success',
+  buttonType: 'text',
+  size: 'small',
+  command: (row: any) => {
+    console.log(row);
+  },
+};
+
 export interface FilterDef {
   field: string;
   label: string;
@@ -83,7 +108,7 @@ export interface FilterDef {
 
 @Component({
   selector: 'app-data-table',
-  imports: [PrimeNgModules],
+  imports: [PrimeNgModules, TooltipModule],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
 })

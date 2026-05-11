@@ -1,0 +1,258 @@
+<div class="p-8 space-y-8 animate-in fade-in duration-700">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div>
+      <h1 class="text-3xl font-black text-white tracking-tighter">Verifications Center</h1>
+      <p class="text-gray-400 text-sm">
+        Review and validate listing quality and seller identities.
+      </p>
+    </div>
+
+    <!-- Tab Switcher -->
+    <div class="flex p-1.5 glass-tab rounded-2xl">
+      <button
+        (click)="setTab('properties')"
+        [class.active-tab]="activeTab() === 'properties'"
+        class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
+      >
+        Listings ({{ propertyStore.entities().length }})
+      </button>
+      <button
+        (click)="setTab('sellers')"
+        [class.active-tab]="activeTab() === 'sellers'"
+        class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
+      >
+        Sellers ({{ sellerStore.entities().length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="min-h-[60vh]">
+    <!-- PROPERTIES TAB -->
+    <div
+      *ngIf="activeTab() === 'properties'"
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+    >
+      <div
+        *ngFor="let p of propertyStore.entities()"
+        class="glass-tab p-5 rounded-[2rem] flex items-center gap-5 hover:border-green-400/30 transition-all duration-500 group relative overflow-hidden"
+      >
+        <!-- Small Hero Image -->
+        <div
+          class="h-20 w-20 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 bg-gray-900 group-hover:border-green-400/20 transition-all"
+        >
+          <img
+            [src]="getCloudinaryUrl(p.hero_image)"
+            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        </div>
+
+        <!-- Info Section -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span
+              class="px-2 py-0.5 rounded-md bg-green-400/10 text-green-400 text-[8px] font-black uppercase tracking-widest border border-green-400/20"
+            >
+              {{ p.property_type }}
+            </span>
+          </div>
+          <h3
+            class="text-white font-bold text-sm truncate mb-1 group-hover:text-green-400 transition-colors"
+          >
+            {{ p.title }}
+          </h3>
+          <div class="flex items-baseline gap-1">
+            <span class="text-[8px] font-black text-gray-500">PKR</span>
+            <p class="text-white text-base font-black tracking-tight">
+              {{ p.sale_price || p.rent_price | number }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Compact Actions -->
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <button
+              (click)="onVerifyProperty(p.id)"
+              class="h-9 w-9 flex items-center justify-center rounded-xl bg-green-400 text-black hover:bg-green-300 transition-all shadow-lg shadow-green-400/10 active:scale-90"
+              pTooltip="Approve Listing"
+            >
+              <i class="pi pi-check text-xs font-bold"></i>
+            </button>
+            <button
+              (click)="onRejectProperty(p.id)"
+              class="h-9 w-9 flex items-center justify-center rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all active:scale-90"
+              pTooltip="Reject Listing"
+            >
+              <i class="pi pi-times text-xs"></i>
+            </button>
+          </div>
+          <button
+            (click)="viewProperty(p.id)"
+            class="w-full py-1.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-gray-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest"
+          >
+            Review
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="propertyStore.entities().length === 0"
+        class="col-span-full flex flex-col items-center justify-center py-20 glass-card rounded-[2rem] border-dashed border-white/5"
+      >
+        <div class="h-16 w-16 rounded-full bg-white/[0.02] flex items-center justify-center mb-4">
+          <i class="pi pi-verified text-3xl text-gray-700"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-400">All properties verified</h3>
+        <p class="text-gray-600 text-sm mt-1">No pending verification requests at the moment.</p>
+      </div>
+    </div>
+
+    <!-- SELLERS TAB -->
+    <div *ngIf="activeTab() === 'sellers'" class="space-y-4">
+      <div
+        *ngFor="let s of sellerStore.entities()"
+        (click)="openSellerModal(s)"
+        class="glass-card rounded-2xl p-6 flex items-center justify-between group cursor-pointer hover:bg-white/[0.03] transition-all"
+      >
+        <div class="flex items-center gap-5">
+          <div
+            class="h-14 w-14 rounded-2xl bg-green-400/10 flex items-center justify-center text-green-400 font-black text-xl border border-green-400/20"
+          >
+            {{ s.user.full_name.charAt(0) }}
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white group-hover:text-green-400 transition-colors">
+              {{ s.user.full_name }}
+            </h3>
+            <div class="flex items-center gap-3 mt-1 text-gray-500 text-xs">
+              <span><i class="pi pi-envelope mr-1"></i> {{ s.user.email }}</span>
+              <span class="h-1 w-1 rounded-full bg-white/20"></span>
+              <span><i class="pi pi-map-marker mr-1"></i> {{ s.city }}, {{ s.country }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span
+            class="text-[10px] font-black text-green-400/60 uppercase tracking-widest bg-green-400/5 px-3 py-1 rounded-full"
+            >Documents Ready</span
+          >
+          <i class="pi pi-chevron-right text-gray-700"></i>
+        </div>
+      </div>
+
+      <!-- Empty State Sellers -->
+      <div
+        *ngIf="sellerStore.entities().length === 0"
+        class="flex flex-col items-center justify-center py-20 glass-card rounded-[2rem] border-dashed border-white/5"
+      >
+        <i class="pi pi-users text-3xl text-gray-700 mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-400">No pending seller identities</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELLER VERIFICATION MODAL -->
+  <app-popup-backdrop
+    *ngIf="selectedSeller() as s"
+    (onClose)="closeSellerModal()"
+    [closeOnOutsideClick]="true"
+  >
+    <div
+      class="glass-modal max-w-4xl w-full rounded-[2.5rem] p-10 relative shadow-2xl flex flex-col max-h-[85vh]"
+    >
+      <button
+        (click)="closeSellerModal()"
+        class="absolute top-8 right-8 h-10 w-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all z-10"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+
+      <!-- Scrollable body -->
+      <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+        <div class="flex items-center gap-6 mb-10 pb-10 border-b border-white/5">
+          <div
+            class="h-20 w-20 rounded-3xl bg-green-400 text-black flex items-center justify-center text-3xl font-black shadow-lg shadow-green-400/20"
+          >
+            {{ s.user.full_name.charAt(0) }}
+          </div>
+          <div>
+            <h2 class="text-3xl font-black text-white tracking-tight">{{ s.user.full_name }}</h2>
+            <p
+              class="text-gray-500 uppercase tracking-widest text-[10px] font-black mt-2 bg-white/5 px-3 py-1 rounded-full inline-block"
+            >
+              Seller Identity Verification
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          <!-- CNIC Front -->
+          <div class="space-y-4">
+            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">
+              CNIC Front View
+            </p>
+            <div
+              class="doc-card aspect-[1.6/1] rounded-3xl overflow-hidden group border border-white/5 bg-black/20"
+            >
+              <img
+                *ngIf="s.docs?.CNIC_Front"
+                [src]="getCloudinaryUrl(s.docs!.CNIC_Front!)"
+                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
+              />
+              <div
+                *ngIf="!s.docs?.CNIC_Front"
+                class="w-full h-full flex flex-col items-center justify-center text-gray-600"
+              >
+                <i class="pi pi-image text-4xl mb-3 opacity-20"></i>
+                <p class="text-[10px] font-bold">MISSING DOCUMENT</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CNIC Back -->
+          <div class="space-y-4">
+            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2">
+              CNIC Back View
+            </p>
+            <div
+              class="doc-card aspect-[1.6/1] rounded-3xl overflow-hidden group border border-white/5 bg-black/20"
+            >
+              <img
+                *ngIf="s.docs?.CNIC_Back"
+                [src]="getCloudinaryUrl(s.docs!.CNIC_Back!)"
+                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
+              />
+              <div
+                *ngIf="!s.docs?.CNIC_Back"
+                class="w-full h-full flex flex-col items-center justify-center text-gray-600"
+              >
+                <i class="pi pi-image text-4xl mb-3 opacity-20"></i>
+                <p class="text-[10px] font-bold">MISSING DOCUMENT</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky Action Footer -->
+      <div class="flex gap-4 pt-8 border-t border-white/5 bg-transparent mt-auto">
+        <button
+          (click)="onRejectSeller(s.id)"
+          class="px-10 py-4 bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold rounded-2xl hover:bg-rose-500 hover:text-white transition-all active:scale-95"
+        >
+          Reject
+        </button>
+        <button
+          (click)="onApproveSeller(s.id)"
+          class="flex-1 py-4 bg-green-300 text-black font-black rounded-2xl hover:bg-green-300 transition-all shadow-xl shadow-green-400/20 active:scale-95"
+        >
+          Approve Verification
+        </button>
+      </div>
+    </div>
+  </app-popup-backdrop>
+</div>

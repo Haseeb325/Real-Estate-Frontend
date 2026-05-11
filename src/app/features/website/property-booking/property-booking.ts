@@ -61,7 +61,7 @@ export class PropertyBooking implements OnInit, OnDestroy {
     const property = this.selectedProperty();
     if (!property) return 0;
 
-    if (this.purchaseType === 'Rent') {
+    if (this.purchaseType === 'rent') {
       const rent = parseFloat(property.rent_price || '0') || 0;
       const deposit = parseFloat(property.security_deposit || '0') || 0;
       return rent + deposit;

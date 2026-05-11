@@ -24,9 +24,9 @@ export class PaymentStore {
   /**
    * Fetches all rental agreements for the logged-in user
    */
-  loadAgreements() {
+  loadAgreements(url: any) {
     this.isLoading.set(true);
-    const obs = this.apiService.get<any>(URLConfig.rentalAgreements).pipe(
+    const obs = this.apiService.get<any>(url).pipe(
       tap((res) => {
         const data = res.data || res;
         this.agreements.set(Array.isArray(data) ? data : []);
@@ -42,9 +42,9 @@ export class PaymentStore {
   /**
    * Fetches all payment history for the logged-in user
    */
-  loadPayments() {
+  loadPayments(url: any) {
     this.isLoading.set(true);
-    const obs = this.apiService.get<any>(URLConfig.paymentHistory).pipe(
+    const obs = this.apiService.get<any>(url).pipe(
       tap((res) => {
         const data = res.data || res;
         this.payments.set(Array.isArray(data) ? data : []);
@@ -68,14 +68,16 @@ export class PaymentStore {
       this.toastService.success(res.message || 'Payment processed successfully');
 
       // Refresh state and WAIT for it to finish
-      await Promise.all([lastValueFrom(this.loadAgreements()), lastValueFrom(this.loadPayments())]);
+      await Promise.all([
+        lastValueFrom(this.loadAgreements(URLConfig.rentalAgreements)),
+        lastValueFrom(this.loadPayments(URLConfig.paymentHistory)),
+      ]);
 
       return res.data;
     } catch (error: any) {
       this.toastService.error(error.error?.message || 'Payment failed. Please try again.');
       throw error;
     } finally {
-      this.isLoading.set(true); // Wait, should be false.
       this.isLoading.set(false);
     }
   }

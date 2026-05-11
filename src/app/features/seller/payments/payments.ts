@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RentalAgreements } from '../../../shared/components/rental-agreements/rental-agreements';
-
+import { URLConfig } from '../../../shared/utils/url-config';
 @Component({
   selector: 'app-seller-payments',
   standalone: true,
@@ -12,8 +12,14 @@ import { RentalAgreements } from '../../../shared/components/rental-agreements/r
         <p class="text-gray-500">Track your earnings, active rentals, and property sales.</p>
       </div>
 
-      <app-rental-agreements></app-rental-agreements>
+      <app-rental-agreements
+        [PaymentUrl]="paymentUrl"
+        [RentalPaymentUrl]="rentalUrl"
+      ></app-rental-agreements>
     </div>
   `,
 })
-export class SellerPayments {}
+export class SellerPayments {
+  paymentUrl = URLConfig.paymentHistory;
+  rentalUrl = URLConfig.rentalAgreements;
+}

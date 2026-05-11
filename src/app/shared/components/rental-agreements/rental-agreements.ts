@@ -3,6 +3,7 @@ import { PaymentStore } from '../../stores/paymentStore';
 import { Shared } from '../../shared.module';
 import { AuthStore } from '../../authStore';
 import { RentalAgreement, MonthlyRentPayment } from '../../../core/interfaces/payment';
+import { Input } from '@angular/core';
 
 @Component({
   selector: 'app-rental-agreements',
@@ -12,6 +13,8 @@ import { RentalAgreement, MonthlyRentPayment } from '../../../core/interfaces/pa
   styleUrl: './rental-agreements.scss',
 })
 export class RentalAgreements {
+  @Input() PaymentUrl: string = '';
+  @Input() RentalPaymentUrl: string = '';
   store = inject(PaymentStore);
   authStore = inject(AuthStore);
 
@@ -27,8 +30,8 @@ export class RentalAgreements {
   user = this.authStore.user;
 
   ngOnInit() {
-    this.store.loadAgreements();
-    this.store.loadPayments();
+    this.store.loadAgreements(this.RentalPaymentUrl);
+    this.store.loadPayments(this.PaymentUrl);
   }
 
   openDetails(agreement: RentalAgreement) {
@@ -57,7 +60,7 @@ export class RentalAgreements {
       const updatedAgreements = this.store.agreements();
       const updated = updatedAgreements.find((a) => a.id === agreement.id);
       if (updated) this.selectedAgreement.set(updated);
-      this.store.loadAgreements();
+      this.store.loadAgreements(this.RentalPaymentUrl);
     } catch (err) {
       console.error('Payment failed', err);
     }

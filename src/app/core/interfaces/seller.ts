@@ -7,6 +7,7 @@ export interface SellerDocuments {
 }
 
 export interface sellerProfile {
+  id: string; // Required for Store indexing
   user: User;
   stripe_account_id?: string;
   phone: string;
@@ -18,6 +19,8 @@ export interface sellerProfile {
   state?: string;
   country?: string;
   is_verified_seller?: boolean;
+  created_at?: string;
+  updated_at?: string;
   profileImage?: string; // UI property mapping
   fullLocation?: string; // UI property mapping
 }

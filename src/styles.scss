@@ -2,6 +2,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, app-root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #111827; /* gray-900 */
+}
+
 @import "primeicons/primeicons.css";
 
 /* PrimeNG select overlay styling */
@@ -143,5 +151,31 @@
           color: #f87171;
           i { color: #f87171; }
       }
+  }
+}
+
+/* Custom Tooltip Styling */
+.p-tooltip.custom-tooltip {
+  .p-tooltip-text {
+    background: #1e3a8a !important; /* blue-900 */
+    color: #bfdbfe !important; /* blue-200 */
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    border: 1px solid #3b82f6 !important; /* blue-500 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  &.p-tooltip-top .p-tooltip-arrow {
+    border-top-color: #1e3a8a !important;
+  }
+  &.p-tooltip-bottom .p-tooltip-arrow {
+    border-bottom-color: #1e3a8a !important;
+  }
+  &.p-tooltip-left .p-tooltip-arrow {
+    border-left-color: #1e3a8a !important;
+  }
+  &.p-tooltip-right .p-tooltip-arrow {
+    border-right-color: #1e3a8a !important;
   }
 }

@@ -1,0 +1,280 @@
+<div class="min-h-screen bg-black p-4 lg:p-8 text-gray-100">
+  <!-- Back Button & Title -->
+  <div class="max-w-7xl mx-auto mb-8 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <button
+        routerLink="/admin/listings"
+        class="h-10 w-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+      >
+        <i class="pi pi-arrow-left"></i>
+      </button>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Property Details</h1>
+        <p class="text-gray-400 text-sm">Reviewing listing #{{ property()?.id }}</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+      <button
+        *ngIf="property()?.status === 'active'"
+        (click)="inactivateProperty(property()!.id)"
+        class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg border border-red-500/20 transition-all"
+      >
+        Suspend Listing
+      </button>
+      <button
+        *ngIf="property()?.status === 'inactive'"
+        (click)="activateProperty(property()!.id)"
+        class="px-4 py-2 bg-green-500/10 hover:bg-green-400 text-black font-semibold rounded-lg border border-green-500/20 transition-all"
+      >
+        Approve Listing
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div
+    *ngIf="isLoading()"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+  >
+    <div class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4">
+      <div
+        class="w-12 h-12 border-4 border-green-400/20 border-t-green-400 rounded-full animate-spin"
+      ></div>
+      <p class="text-xs font-black uppercase tracking-widest text-white">Updating Registry...</p>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div
+    *ngIf="property() as p"
+    class="max-w-[1400px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 animate-in fade-in duration-700"
+  >
+    <!-- Left Column: 8/12 - Hero & Details -->
+    <div class="xl:col-span-8 space-y-6">
+      <!-- Hero Card -->
+      <div class="glass-card rounded-[2rem] overflow-hidden border-white/10 shadow-2xl">
+        <!-- Main Image -->
+        <div class="relative h-[300px] min-h-[300px] max-h-[300px] overflow-hidden">
+          <img
+            [src]="getCloudinaryUrl(p.hero_image)"
+            [alt]="p.title"
+            class="w-full object-cover block"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"
+          ></div>
+          <div class="absolute top-6 left-6">
+            <span
+              class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-green-400 text-black"
+            >
+              {{ p.property_type }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Info Bar -->
+        <div class="p-8">
+          <div class="flex flex-wrap justify-between items-end gap-6 border-b border-white/5 pb-8">
+            <div class="flex-1 min-w-[300px]">
+              <h2 class="text-3xl font-black text-white tracking-tighter mb-4">{{ p.title }}</h2>
+              <div class="flex flex-wrap items-center gap-4 text-gray-400">
+                <span class="flex items-center gap-2"
+                  ><i class="pi pi-map-marker text-green-400"></i> {{ p.location_text }}</span
+                >
+                <span class="h-1 w-1 rounded-full bg-white/20"></span>
+                <button
+                  (click)="onViewMap()"
+                  class="text-green-400 font-bold hover:text-white transition-colors text-sm uppercase tracking-tighter"
+                >
+                  View on Map
+                </button>
+              </div>
+            </div>
+            <div class="text-right whitespace-nowrap">
+              <p class="text-[10px] uppercase font-black text-gray-500 mb-2 tracking-widest">
+                Market Value
+              </p>
+              <div class="text-4xl font-black text-white flex items-baseline gap-2">
+                <span class="text-green-400 text-xl font-bold">PKR</span>
+                {{ p.sale_price || p.rent_price || 'N/A' }}
+              </div>
+              <p *ngIf="p.sale_type === 'rent'" class="text-gray-500 font-bold mt-1">per month</p>
+            </div>
+          </div>
+
+          <!-- Secondary Gallery -->
+          <div class="mt-8 flex gap-4 overflow-x-auto pb-2 scrollbar-hide" *ngIf="p.images?.length">
+            <div
+              *ngFor="let img of p.images"
+              class="h-24 w-32 flex-shrink-0 rounded-2xl overflow-hidden border border-white/10 hover:border-green-400 transition-all cursor-pointer"
+            >
+              <img [src]="getCloudinaryUrl(img.image)" class="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="glass-card rounded-[2rem] p-8">
+        <h3 class="text-2xl font-black text-white mb-8 flex items-center gap-4">
+          <span class="h-2 w-2 rounded-full bg-green-400"></span> Amenities & Features
+        </h3>
+        <div class="flex flex-wrap gap-3">
+          <div
+            *ngFor="let f of getFeatures()"
+            class="px-5 py-3 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center gap-3 hover:bg-white/[0.06] transition-all"
+          >
+            <i class="pi pi-check text-green-400"></i>
+            <span class="text-sm font-bold text-gray-300">{{ f.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="glass-card rounded-[2rem] p-8">
+        <h3 class="text-2xl font-black text-white mb-6 flex items-center gap-4">
+          <span class="h-2 w-2 rounded-full bg-green-400"></span> Description
+        </h3>
+        <p class="text-gray-400 text-xl font-light leading-relaxed">
+          {{
+            p.house?.description ||
+              p.apartment?.description ||
+              p.commercial?.description ||
+              p.plots_and_land?.description ||
+              'No description provided.'
+          }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Right Column: 4/12 - Sidebar -->
+    <div class="xl:col-span-4 space-y-6">
+      <!-- Status Card -->
+      <div class="glass-card rounded-[2rem] p-8">
+        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-6">
+          Listing Status
+        </p>
+        <div
+          class="flex justify-between items-center bg-white/[0.02] p-4 rounded-3xl border border-white/5"
+        >
+          <span
+            [class]="'px-6 py-3 rounded-2xl font-black text-sm ' + getStatusColor(p.status || '')"
+          >
+            {{ p.status || 'pending' | uppercase }}
+          </span>
+          <div class="text-right">
+            <p class="text-[10px] text-gray-600 font-bold">UPDATED</p>
+            <p class="text-white font-bold text-sm">{{ p.updated_at | date: 'mediumDate' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Specifications -->
+      <div class="glass-card rounded-[2rem] p-8">
+        <h3 class="text-2xl font-black text-white mb-8 flex items-center gap-4">
+          <span class="h-2 w-2 rounded-full bg-green-400"></span> Tech Specs
+        </h3>
+        <div class="space-y-2">
+          <!-- Sale Info -->
+          <div class="grid grid-cols-2 gap-2 mb-6">
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+              <p class="text-[10px] font-black text-gray-500 uppercase mb-1">TYPE</p>
+              <p class="text-white font-black">{{ p.sale_type | uppercase }}</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/5">
+              <p class="text-[10px] font-black text-gray-500 uppercase mb-1">STATUS</p>
+              <p class="text-green-400 font-black">{{ p.is_available ? 'AVAIL' : 'SOLD' }}</p>
+            </div>
+          </div>
+
+          <!-- Dynamic Rows -->
+          <div class="space-y-1">
+            <!-- HOUSE -->
+            <ng-container *ngIf="p.house as h">
+              <div class="spec-row">
+                <span>Type</span><span class="val">{{ h.sub_type }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Beds</span><span class="val">{{ h.bedrooms }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Baths</span><span class="val">{{ h.bathrooms }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Area</span><span class="val">{{ h.builtup_area }} sqft</span>
+              </div>
+              <div class="spec-row">
+                <span>Plot</span><span class="val">{{ h.plot_size }} M</span>
+              </div>
+              <div class="spec-row">
+                <span>Year</span><span class="val">{{ h.year_built }}</span>
+              </div>
+            </ng-container>
+
+            <!-- APARTMENT -->
+            <ng-container *ngIf="p.apartment as a">
+              <div class="spec-row">
+                <span>Beds</span><span class="val">{{ a.bedrooms }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Baths</span><span class="val">{{ a.bathrooms }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Area</span><span class="val">{{ a.builtup_area }} sqft</span>
+              </div>
+              <div class="spec-row">
+                <span>Furnished</span><span class="val">{{ a.furnishing }}</span>
+              </div>
+            </ng-container>
+
+            <!-- PLOTS -->
+            <ng-container *ngIf="p.plots_and_land as l">
+              <div class="spec-row">
+                <span>Area</span><span class="val">{{ l.area }} M</span>
+              </div>
+              <div class="spec-row">
+                <span>Type</span><span class="val">{{ l.plot_type }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Possession</span><span class="val">{{ l.possession_status }}</span>
+              </div>
+            </ng-container>
+
+            <!-- COMMERCIAL -->
+            <ng-container *ngIf="p.commercial as c">
+              <div class="spec-row">
+                <span>Grade</span><span class="val">{{ c.building_grade }}</span>
+              </div>
+              <div class="spec-row">
+                <span>Area</span><span class="val">{{ c.builtup_area }} sqft</span>
+              </div>
+              <div class="spec-row">
+                <span>Floor</span><span class="val">{{ c.floor_number }}</span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seller Info -->
+      <div class="glass-card rounded-[2rem] p-8" *ngIf="p.user">
+        <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-6">
+          Owner Information
+        </p>
+        <div class="flex items-center gap-4 p-4 rounded-3xl bg-white/[0.02] border border-white/5">
+          <div
+            class="h-12 w-12 rounded-2xl bg-green-400 text-black flex items-center justify-center font-black text-xl"
+          >
+            {{ p.user.full_name.charAt(0) }}
+          </div>
+          <div>
+            <p class="font-black text-white">{{ p.user.full_name }}</p>
+            <p class="text-xs text-gray-500">{{ p.user.email }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

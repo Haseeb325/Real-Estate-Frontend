@@ -33,6 +33,7 @@ import { MessageModule } from 'primeng/message';
 import { MenuModule } from 'primeng/menu';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
 
 const shared = [
   CommonModule,
@@ -73,6 +74,7 @@ const primeNg = [
   MenuModule,
   AccordionModule,
   ConfirmDialogModule,
+  TooltipModule,
 ];
 
 @NgModule({
