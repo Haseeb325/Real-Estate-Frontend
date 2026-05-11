@@ -191,6 +191,7 @@
       <button
         class="menu-item-btn"
         [class.danger]="action.severity === 'danger'"
+        [disabled]="action.disabled"
         (click)="action.command(); op.hide()"
       >
         <i [class]="action.icon"></i>

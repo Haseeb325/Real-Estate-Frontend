@@ -29,7 +29,7 @@ export class Landing implements OnInit, OnDestroy {
   selectedFurnishing = signal<string>(this.filterState.filters()['furnishing'] || '');
   selectedLocation = signal<string>(this.filterState.filters()['location_text'] || '');
   minPrice = signal<number>(this.filterState.filters()['min_price'] ?? 0);
-  maxPrice = signal<number>(this.filterState.filters()['max_price'] ?? 10000000);
+  maxPrice = signal<number>(this.filterState.filters()['max_price'] ?? 100000000000);
   purchaseType = signal<string>(this.filterState.filters()['sale_type'] || '');
 
   // Computed for unique bedroom options
@@ -93,7 +93,7 @@ export class Landing implements OnInit, OnDestroy {
       this.selectedFurnishing.set('')
       this.selectedPriceRange.set('')
       this.minPrice.set(0)
-      this.maxPrice.set(10000000)
+      this.maxPrice.set(100000000000)
       this.purchaseType.set('')
 
     }
@@ -138,7 +138,7 @@ export class Landing implements OnInit, OnDestroy {
     this.selectedFurnishing.set('');
     this.purchaseType.set('');
     this.minPrice.set(0);
-    this.maxPrice.set(10000000);
+    this.maxPrice.set(100000000000);
     this.params = { page: 1, page_size: 7 };
     this.filterState.clearState();
     this.loadProperties(false);

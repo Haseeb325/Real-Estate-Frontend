@@ -139,6 +139,18 @@ html, body, app-root {
     }
   }
 
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      background: transparent;
+      color: #94a3b8;
+      i {
+        color: #94a3b8;
+      }
+    }
+  }
+
   i {
     font-size: 14px;
     transition: color 0.2s ease;
@@ -150,6 +162,15 @@ html, body, app-root {
           background: rgba(239, 68, 68, 0.1);
           color: #f87171;
           i { color: #f87171; }
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        &:hover {
+          background: transparent;
+          color: #ef4444;
+          i { color: #ef4444; }
+        }
       }
   }
 }
