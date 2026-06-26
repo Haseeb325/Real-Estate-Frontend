@@ -39,12 +39,12 @@
 
     <!-- Data Table -->
     <app-data-table
-      [data]="users"
+      [data]="nonAdminUsers"
       [columns]="columns"
       [filterConfig]="filters"
       [loading]="isLoading"
       [serverFilter]="true"
-      [totalRecords]="userStore.totalCount()"
+      [totalRecords]="nonAdminCount()"
       [pageSize]="params.page_size"
       [currentPage]="params.page"
       [rowActions]="rowActions"

@@ -101,6 +101,8 @@ ngOnInit() {
       }
     })
     payload = formData
+    // Set temporary preview for header
+    this.profileService.tempProfileImage.set(this.imagePreview());
    }else{
     payload = formValue
     useFormData = false
@@ -115,10 +117,12 @@ ngOnInit() {
       updateState: true,
     }).catch(error=>{
       console.error("Profile update failed", error)
+      this.profileService.tempProfileImage.set(null)
       this.isEditModalOpen.set(false)
     }).finally(()=>{
       this.isEditModalOpen.set(false)
       this.imagePreview.set(null)
+      this.profileData()
     })
 
 

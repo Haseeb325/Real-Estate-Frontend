@@ -40,7 +40,7 @@
           <ng-container *ngIf="isLoading(); else userCount">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </ng-container>
-          <ng-template #userCount>{{ stats()?.total_users ?? 0 }}</ng-template>
+          <ng-template #userCount>{{ stats()?.total_users ? stats()!.total_users - 1 : 0 }}</ng-template>
         </p>
         <p class="text-xs text-gray-500 sm:text-sm">Buyers and sellers with verified email.</p>
       </div>
@@ -87,19 +87,20 @@
             <ng-container *ngIf="isLoading(); else pendingCount">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </ng-container>
-            <ng-template #pendingCount>{{ stats()?.pending_verifications?.total_pending ?? 0 }}</ng-template>
+            <ng-template #pendingCount>{{ pendingVerifCount() }}</ng-template>
           </p>
           <span
-            *ngIf="(stats()?.pending_verifications?.total_pending ?? 0) > 0"
+            *ngIf="pendingVerifCount() > 0"
             class="inline-block rounded-full bg-orange-900/40 px-3 py-1 text-xs font-medium text-orange-300 animate-pulse"
           >
             <i class="fas fa-exclamation-circle mr-1"></i>
             Action needed
           </span>
         </div>
-        <a href="#" class="text-sm font-medium text-blue-400 transition hover:text-blue-300"
-          >view all details</a
-        >
+        <a
+          routerLink="/admin/verifications"
+          class="text-sm font-medium text-blue-400 transition hover:text-blue-300"
+        >view all details</a>
       </div>
     </div>
   </div>

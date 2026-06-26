@@ -35,16 +35,23 @@
           @if (property()?.sale_type == 'sale' || property()?.sale_type == 'both') {
             <button
               (click)="purchaseType = 'Buy'"
-              class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium"
-            > Buy
-          </button>
-             
-          
+              [class.bg-blue-600]="purchaseType === 'Buy'"
+              [class.hover:bg-blue-700]="purchaseType === 'Buy'"
+              [class.bg-slate-750]="purchaseType !== 'Buy'"
+              [class.hover:bg-slate-700]="purchaseType !== 'Buy'"
+              class="px-5 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              Buy
+            </button>
           }
           @if (property()?.sale_type == 'rent' || property()?.sale_type == 'both') {
             <button
               (click)="purchaseType = 'rent'"
-              class="px-5 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium"
+              [class.bg-blue-600]="purchaseType === 'rent'"
+              [class.hover:bg-blue-700]="purchaseType === 'rent'"
+              [class.bg-slate-750]="purchaseType !== 'rent'"
+              [class.hover:bg-slate-700]="purchaseType !== 'rent'"
+              class="px-5 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Rent
             </button>
@@ -53,13 +60,29 @@
       </div>
     </div>
 
-    <!-- Property Image -->
-    <div class="my-6 rounded-xl overflow-hidden">
-      <img
-        [src]="getCloudinaryUrl(property()?.hero_image)"
-        class="w-full h-64 md:h-96 object-cover"
-        alt="Property"
-      />
+    <!-- Property Image & Gallery Carousel -->
+    <div class="my-6">
+      <div class="rounded-xl overflow-hidden relative bg-slate-900 border border-slate-700">
+        <img
+          [src]="getCloudinaryUrl(activeImage() || property()?.hero_image)"
+          class="w-full h-64 md:h-[450px] object-cover transition-all duration-300"
+          alt="Property"
+        />
+      </div>
+
+      <!-- Small Moveable Carousel -->
+      @if (carouselImages().length > 0) {
+        <div class="mt-4 flex gap-3 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          @for (img of carouselImages(); track img; let i = $index) {
+            <div 
+              (click)="swapImage(i)"
+              class="w-24 h-16 md:w-32 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 border-slate-700 hover:border-blue-500 cursor-pointer transition-all duration-200 active:scale-95 bg-slate-900"
+            >
+              <img [src]="getCloudinaryUrl(img)" class="w-full h-full object-cover" alt="Property Thumbnail" />
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <!-- Details Section -->
@@ -97,16 +120,11 @@
         PKR
       </h4>
 
-      <div
-        [routerLink]="[
-          '/property-booking',
-          this.property()?.property_type,
-          this.purchaseType,
-          this.property()?.id,
-        ]"
-        class=""
-      >
-        <button class="w-full p-3 bg-blue-600 hover:bg-blue-700 rounded-full font-medium">
+      <div>
+        <button 
+          (click)="proceedToBooking()"
+          class="w-full p-3 bg-blue-600 hover:bg-blue-700 rounded-full font-medium transition-colors"
+        >
           {{ purchaseType == 'Buy' ? 'Proceed to buy' : 'Proceed to rent' }}
         </button>
       </div>
@@ -138,5 +156,38 @@
     </div>
   </div>
 
-  <!-- </div> -->
+  <!-- Auth Required Modal -->
+  @if (showAuthDialog()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all duration-300 scale-100">
+        <div class="text-center">
+          <!-- Icon -->
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-900/40 text-blue-400 mb-4 border border-blue-500/20">
+            <i class="fas fa-user-lock text-2xl"></i>
+          </div>
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-white mb-2">Sign In Required</h3>
+          <!-- Description -->
+          <p class="text-slate-300 text-sm mb-6 leading-relaxed font-medium">
+            You must be signed in to proceed. Please sign in to buy or rent this property.
+          </p>
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              (click)="showAuthDialog.set(false)"
+              class="flex-1 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition-all border border-slate-700"
+            >
+              Cancel
+            </button>
+            <button
+              (click)="showAuthDialog.set(false); router.navigate(['/sign-in'])"
+              class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-blue-500/20"
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

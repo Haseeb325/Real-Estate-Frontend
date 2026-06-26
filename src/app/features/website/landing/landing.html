@@ -63,7 +63,7 @@
               <option value="commercial">Commercial</option>
             </select>
           </div>
-          <div class="w-full md:w-1/6">
+          <!-- <div class="w-full md:w-1/6">
             <label class="block text-xs font-bold text-indigo-400 uppercase mb-2"
               >Property Type</label
             >
@@ -76,7 +76,7 @@
               <option value="sale">Sell</option>
               <option value="rent">Rent</option>
             </select>
-          </div>
+          </div> -->
 
           <!-- Min Price Filter -->
           <div class="w-full md:w-1/6">
@@ -87,11 +87,11 @@
               class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]"
             >
               <option value="">Any</option>
-              <option value="0">$0</option>
-              <option value="100000">$100K</option>
-              <option value="500000">$500K</option>
-              <option value="1000000">$1M</option>
-              <option value="5000000">$5M</option>
+              <option value="0">PKR 0</option>
+              <option value="100000">PKR 100K</option>
+              <option value="500000">PKR 500K</option>
+              <option value="1000000">PKR 1M</option>
+              <option value="5000000">PKR 5M</option>
             </select>
           </div>
 
@@ -103,12 +103,12 @@
               (ngModelChange)="maxPrice.set($event)"
               class="w-full border border-slate-600 rounded-lg px-3 py-2 text-sm bg-[#0f172a] text-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none h-[38px]"
             >
-              <option value="">Any</option>
-              <option value="100000">$100K</option>
-              <option value="500000">$500K</option>
-              <option value="1000000">$1M</option>
-              <option value="5000000">$5M</option>
-              <option value="10000000">$10M+</option>
+              <option value="100000000000">Any</option>
+              <option value="100000">PKR 100K</option>
+              <option value="500000">PKR 500K</option>
+              <option value="1000000">PKR 1M</option>
+              <option value="5000000">PKR 5M</option>
+              <option value="10000000">PKR 10M+</option>
             </select>
           </div>
 
@@ -291,8 +291,8 @@
               <h3 class="text-brand-blue text-xl font-bold mb-1">
                 {{
                   property.sale_type == 'both' || property.sale_type == 'sale'
-                    ? '$' + property.sale_price?.toLocaleString()
-                    : '$' + property.rent_price?.toLocaleString()
+                    ? 'PKR ' + property.sale_price?.toLocaleString()
+                    : 'PKR ' + property.rent_price?.toLocaleString()
                 }}
               </h3>
               <p class="text-white font-medium mb-3">{{ property.location_text }}</p>
@@ -308,7 +308,11 @@
       <div>
         <div class="flex items-center gap-2 mb-4 text-white">
           <!-- <div class="w-6 h-6 bg-slate-700 rounded-full"></div> -->
-        <img class="h-10 w-10 mb-2 justify-center items-center" src="assets/images/propify-removebg-preview.png" alt="">
+          <img
+            class="h-10 w-10 mb-2 justify-center items-center"
+            src="assets/images/propify-removebg-preview.png"
+            alt=""
+          />
           <span class="font-serif tracking-widest uppercase font-bold">Propify</span>
         </div>
         <p>Your trusted partner in finding the perfect property in any neighborhood.</p>

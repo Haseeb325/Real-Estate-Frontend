@@ -1,6 +1,7 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatSession } from '../../../../core/models/chat.models';
+import { GlobalNotificationService } from '../../../../core/services/global-notification.service';
 
 @Component({
   selector: 'app-session-list',
@@ -10,6 +11,7 @@ import { ChatSession } from '../../../../core/models/chat.models';
   styleUrl: './session-list.scss',
 })
 export class SessionList {
+  globalNotification = inject(GlobalNotificationService);
   sessions = input.required<ChatSession[]>();
   activeSessionId = input<string | null>(null);
   isLoading = input(false);

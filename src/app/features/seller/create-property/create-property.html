@@ -17,9 +17,15 @@
       </div>
       <button
         type="submit"
-        class="whitespace-nowrap rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+        [disabled]="isLoading"
+        class="flex items-center gap-2 whitespace-nowrap rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {{ isEditMode ? 'Update listing' : 'Publish listing' }}
+        @if (isLoading) {
+          <i class="pi pi-spin pi-spinner text-base"></i>
+          <span>{{ isEditMode ? 'Updating...' : 'Publishing...' }}</span>
+        } @else {
+          {{ isEditMode ? 'Update listing' : 'Publish listing' }}
+        }
       </button>
     </div>
 

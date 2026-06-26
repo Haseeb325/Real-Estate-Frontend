@@ -64,8 +64,27 @@ export const RoleGuard:CanActivateFn=(route, state)=>{
      
     router.navigate(['/sign-in'])
     return false
-    
+}
 
+
+export const PublicGuard: CanActivateFn = (route, state) => {
+    const router = inject(Router)
+    const authStore = inject(AuthStore)
+    const user = authStore.user()
+
+    if (!user) return true  // guest — allow
+
+    if (user.role === 'seller') {
+        router.navigate(['/seller/dashboard'])
+        return false
+    }
+
+    if (user.role === 'admin') {
+        router.navigate(['/admin'])
+        return false
+    }
+
+    return true  // buyer — allow
 }
 
 

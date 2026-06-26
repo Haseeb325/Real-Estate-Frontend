@@ -13,14 +13,14 @@
       <button
         (click)="setTab('properties')"
         [class.active-tab]="activeTab() === 'properties'"
-        class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
+        class="px-6 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-300"
       >
         Listings ({{ propertyStore.entities().length }})
       </button>
       <button
         (click)="setTab('sellers')"
         [class.active-tab]="activeTab() === 'sellers'"
-        class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300"
+        class="px-6 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-300"
       >
         Sellers ({{ sellerStore.entities().length }})
       </button>

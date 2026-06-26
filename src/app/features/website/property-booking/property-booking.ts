@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { WebSiteService } from '../website.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '../../../core/services/chat.service';
+import { GlobalNotificationService } from '../../../core/services/global-notification.service';
 import { MessageList } from '../../../shared/components/chat-inbox/message-list/message-list';
 import { MessageInput } from '../../../shared/components/chat-inbox/message-input/message-input';
 import { PaymentStore } from '../../../shared/stores/paymentStore';
@@ -37,6 +38,7 @@ export class PropertyBooking implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   chatService = inject(ChatService);
+  globalNotification = inject(GlobalNotificationService);
   datePipe = inject(DatePipe);
 
   selectedProperty = this.websiteService.selectedProperty;
@@ -72,8 +74,29 @@ export class PropertyBooking implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.id) {
-      this.websiteService.fetchPropertyById(this.id)?.subscribe();
+      this.websiteService.fetchPropertyById(this.id)?.subscribe({
+        next: () => {
+          this.checkAndAutoStartChat();
+        },
+      });
       this.fetchAvailability();
+    }
+  }
+
+  async checkAndAutoStartChat() {
+    const property: any = this.selectedProperty();
+    if (!property || !property.id || !property.user?.id) return;
+
+    try {
+      await this.chatService.loadSessions();
+      const existing = this.chatService.sessions().find(
+        (s) => s.property?.id?.toString() === property.id?.toString()
+      );
+      if (existing) {
+        this.chatService.selectSession(existing);
+      }
+    } catch (err) {
+      console.error('Failed to auto-load chat session:', err);
     }
   }
 
@@ -249,5 +272,20 @@ export class PropertyBooking implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.chatService.disconnectAll();
+  }
+
+  formatLastSeen(isoString: string | null): string {
+    if (!isoString) return 'a while ago';
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'yesterday';
+    return `${diffDays}d ago`;
   }
 }

@@ -10,7 +10,7 @@
             <p class="text-gray-400 text-sm">Manage your Listings in one place.</p>
           </div>
           <button
-            [routerLink]="['/seller/create-listing']"
+            (click)="handleCreateListingClick()"
             class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition text-sm whitespace-nowrap"
           >
             + Create new listing
@@ -62,5 +62,21 @@
       [propertyId]="selectedPropertyId()!"
       (close)="showAvailabilityPopup.set(false)"
     ></app-seller-availability>
+  </app-popup-backdrop>
+}
+
+@if (showNotVerifiedPopup()) {
+  <app-popup-backdrop
+    [closeOnOutsideClick]="true"
+    (onClose)="showNotVerifiedPopup.set(false)"
+    layoutKey="center"
+  >
+    <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4 text-center">
+      <h3 class="text-xl font-bold text-white mb-2">Not Verified</h3>
+      <p class="text-gray-400 mb-6 text-sm">You are not verified. Please upload your documents in your profile to be verified.</p>
+      <div class="flex gap-4 justify-center">
+        <button (click)="showNotVerifiedPopup.set(false)" class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 transition">Close</button>
+      </div>
+    </div>
   </app-popup-backdrop>
 }

@@ -21,22 +21,26 @@
 
 
 import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { MessageService } from 'primeng/api';
-// import { CookieService } from 'ngx-cookie-service';
 import { AuthStore } from './shared/authStore';
+import { GlobalNotificationService } from './core/services/global-notification.service';
 import { providePrimeNG } from 'primeng/config';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
-export function initializeAuth(authStore: AuthStore) {
+export function initializeAuth(authStore: AuthStore, globalNotification: GlobalNotificationService) {
   return (): Promise<void> => {
     return new Promise((resolve) => {
       // Defer to ensure the DOM and Injection Tokens are fully initialized
       setTimeout(() => {
         authStore.init();
+        // Connect global notification WS if user is already logged in
+        if (authStore.isAuthenticated()) {
+          globalNotification.connect();
+        }
         resolve();
       }, 0);
     });
@@ -46,7 +50,7 @@ export function initializeAuth(authStore: AuthStore) {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes, withComponentInputBinding()),
+    provideRouter(routes, withComponentInputBinding(), withInMemoryScrolling({ scrollPositionRestoration: 'enabled' })),
     
     // CookieService,
     MessageService,
@@ -54,7 +58,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,
-      deps: [AuthStore],
+      deps: [AuthStore, GlobalNotificationService],
       multi: true
     },
 

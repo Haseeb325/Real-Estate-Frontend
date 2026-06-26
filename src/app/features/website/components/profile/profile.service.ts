@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, WritableSignal, inject, signal } from "@angular/core";
 import { AdvanceCrudService } from "../../../../shared/advance.crud.service";
 import { BuyerProfile } from "../../../../core/models/buyer.model";
 import { BuyerProfileDto } from "../../../../core/models/buyer.dto";
@@ -11,6 +11,7 @@ import { URLConfig } from "../../../../shared/utils/url-config";
 export class ProfileService extends AdvanceCrudService<BuyerProfile,BuyerProfileDto>{
 
    readonly profileData = this.singleFetchedItem.asReadonly()
+   tempProfileImage: WritableSignal<string | null> = signal<string | null>(null);
 //    getProfile(){
 //     return this.fetch(URLConfig.buyerProfile)
 //    }

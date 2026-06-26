@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../features/auth/auth.service';
 import { Profile } from '../../features/website/components/profile/profile';
 import { PopupBackdrop } from '../popup-backdrop/popup-backdrop';
+import { ProfileService } from '../../features/website/components/profile/profile.service';
+import { getCloudinaryUrl } from '../../shared/utils/common-utils';
 
 @Component({
   selector: 'app-top-header',
@@ -18,11 +20,17 @@ export class TopHeader   {
   protected readonly user = this.authStore.user;
   protected readonly isAuthenticated = this.authStore.isAuthenticated;
   authService = inject(AuthService)
+  profileService = inject(ProfileService)
+  userProfile = this.profileService.profileData
+  tempProfileImage = this.profileService.tempProfileImage
   openProfile:boolean = false
 
   ngOnInit(){
     console.log('TopHeader User Signal:', this.user());
     console.log('Authenticated',this.isAuthenticated())
+    if(this.isAuthenticated()){
+      this.profileService.getProfile()
+    }
   }
   logout(){
 this.authService.logoutUser()
@@ -31,5 +39,7 @@ this.authService.logoutUser()
   closeProfile(){
     this.openProfile = false
   }
+
+  getCloudinary = getCloudinaryUrl
 
 }

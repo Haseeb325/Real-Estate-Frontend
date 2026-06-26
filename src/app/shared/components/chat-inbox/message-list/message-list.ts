@@ -1,6 +1,7 @@
-import { Component, input, ElementRef, viewChild, effect } from '@angular/core';
+import { Component, input, ElementRef, viewChild, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatSession } from '../../../../core/models/chat.models';
+import { ChatService } from '../../../../core/services/chat.service';
 
 @Component({
   selector: 'app-message-list',
@@ -16,15 +17,37 @@ export class MessageList {
   activeSession = input<ChatSession | null>(null);
   isLoading = input(false);
 
+  private chatService = inject(ChatService);
   private scrollContainer = viewChild<ElementRef>('scrollContainer');
 
   constructor() {
-    // Auto-scroll to bottom when new messages arrive
+    // Auto-scroll to bottom and mark messages as read when new messages arrive
     effect(() => {
       const msgs = this.messages(); // track the signal
+      const session = this.activeSession();
       if (msgs.length > 0) {
         // Schedule scroll after DOM update
         setTimeout(() => this.scrollToBottom(), 0);
+
+        if (session) {
+          // Find unread messages sent by the OTHER person — filter out any falsy/undefined IDs
+          const unreadIds = msgs
+            .filter(
+              (msg) =>
+                !msg.is_read &&
+                !this.isOwnMessage(msg) &&
+                msg.id != null &&
+                msg.id !== undefined &&
+                msg.id.toString().trim() !== '' &&
+                msg.id.toString() !== 'undefined',
+            )
+            .map((msg) => msg.id as any);
+
+          if (unreadIds.length > 0) {
+            // Call API to mark as read
+            this.chatService.markMessagesAsRead(session.session_id, unreadIds);
+          }
+        }
       }
     });
   }
@@ -32,7 +55,7 @@ export class MessageList {
   isOwnMessage(message: any): boolean {
     const currentId = this.currentUserId()?.toString();
     const currentUsername = this.currentUserUsername()?.toLowerCase();
-    
+
     // Extract message sender details
     let msgSenderId: string | undefined = undefined;
     let msgSenderUsername: string | undefined = undefined;
@@ -49,7 +72,7 @@ export class MessageList {
     if (currentId && msgSenderId && currentId !== '0' && currentId === msgSenderId) {
       return true;
     }
-    
+
     if (currentUsername && msgSenderUsername && currentUsername === msgSenderUsername) {
       return true;
     }
@@ -57,25 +80,35 @@ export class MessageList {
     // 2. Infer from session roles
     const session = this.activeSession();
     if (session) {
-      const amIBuyer = (currentId && currentId !== '0' && session.buyer?.id?.toString() === currentId) || 
-                       (currentUsername && session.buyer?.username?.toLowerCase() === currentUsername);
-      const amISeller = (currentId && currentId !== '0' && session.seller?.id?.toString() === currentId) || 
-                        (currentUsername && session.seller?.username?.toLowerCase() === currentUsername);
+      const amIBuyer =
+        (currentId && currentId !== '0' && session.buyer?.id?.toString() === currentId) ||
+        (currentUsername && session.buyer?.username?.toLowerCase() === currentUsername);
+      const amISeller =
+        (currentId && currentId !== '0' && session.seller?.id?.toString() === currentId) ||
+        (currentUsername && session.seller?.username?.toLowerCase() === currentUsername);
 
-      const msgIsFromBuyer = (msgSenderId && msgSenderId !== '0' && session.buyer?.id?.toString() === msgSenderId) ||
-                             (msgSenderUsername && session.buyer?.username?.toLowerCase() === msgSenderUsername);
-      const msgIsFromSeller = (msgSenderId && msgSenderId !== '0' && session.seller?.id?.toString() === msgSenderId) ||
-                              (msgSenderUsername && session.seller?.username?.toLowerCase() === msgSenderUsername);
+      const msgIsFromBuyer =
+        (msgSenderId && msgSenderId !== '0' && session.buyer?.id?.toString() === msgSenderId) ||
+        (msgSenderUsername && session.buyer?.username?.toLowerCase() === msgSenderUsername);
+      const msgIsFromSeller =
+        (msgSenderId && msgSenderId !== '0' && session.seller?.id?.toString() === msgSenderId) ||
+        (msgSenderUsername && session.seller?.username?.toLowerCase() === msgSenderUsername);
 
       if (amIBuyer && msgIsFromBuyer) return true;
       if (amISeller && msgIsFromSeller) return true;
     }
 
     // 3. Last resort path check (for testing)
-    if (window.location.pathname.includes('/seller/') && msgSenderUsername === session?.seller?.username?.toLowerCase()) {
+    if (
+      window.location.pathname.includes('/seller/') &&
+      msgSenderUsername === session?.seller?.username?.toLowerCase()
+    ) {
       return true;
     }
-    if (window.location.pathname.includes('/property-booking') && msgSenderUsername === session?.buyer?.username?.toLowerCase()) {
+    if (
+      window.location.pathname.includes('/property-booking') &&
+      msgSenderUsername === session?.buyer?.username?.toLowerCase()
+    ) {
       return true;
     }
 
@@ -86,10 +119,10 @@ export class MessageList {
     if (this.isOwnMessage(message)) {
       return (this.currentUserUsername() || 'M')[0].toUpperCase();
     }
-    
+
     // Use sender_username if available
     if (message.sender_username) return message.sender_username[0].toUpperCase();
-    
+
     // Fallback to sender object
     if (message.sender && typeof message.sender === 'object' && message.sender.username) {
       return message.sender.username[0].toUpperCase();

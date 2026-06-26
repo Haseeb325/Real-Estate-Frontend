@@ -15,26 +15,33 @@
     <!-- Chat Header -->
     @if (chatService.activeSession(); as session) {
       @let other = chatService.otherParticipant();
+      @let presence = globalNotification.getPresence(other?.id || other?.username);
       <div class="chat-header">
         <div class="chat-header-info">
-          <div class="header-avatar">
+          <div class="header-avatar" style="position:relative">
             <span>{{ (other?.username || 'U')[0] | uppercase }}</span>
+            <!-- Presence dot on avatar -->
+            <span
+              style="position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid #1e293b;"
+              [style.background]="presence.isOnline ? '#22c55e' : '#64748b'"
+            ></span>
           </div>
           <div>
             <p class="header-name">
               {{ other?.full_name || other?.username || 'User' }}
             </p>
-            <p class="header-property">{{ session.property.title || 'Property' }}</p>
+            @if (presence.isOnline) {
+              <p style="font-size:0.7rem;color:#22c55e;margin:0;font-weight:600;">● Online</p>
+            } @else if (presence.lastSeen) {
+              <p style="font-size:0.7rem;color:#64748b;margin:0;">Last seen {{ formatLastSeen(presence.lastSeen) }}</p>
+            } @else {
+              <p class="header-property">{{ session.property.title || 'Property' }}</p>
+            }
           </div>
-        </div>
-
-        <!-- Connection Status -->
-        <div class="connection-status" [class]="chatService.connectionStatus()">
-          <span class="status-dot"></span>
-          {{ chatService.connectionStatus() | titlecase }}
         </div>
       </div>
     }
+
 
     <!-- Messages -->
     <app-message-list

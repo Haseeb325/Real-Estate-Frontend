@@ -40,7 +40,9 @@
           <span class="message-time">
             {{ formatTime(message.timestamp) }}
             @if (isOwnMessage(message)) {
-              <span class="read-status">{{ message.is_read ? '✓✓' : '✓' }}</span>
+              <span class="read-status" [class.read]="message.is_read" [class.unread]="!message.is_read">
+                {{ message.is_read ? '✓✓' : '✓' }}
+              </span>
             }
           </span>
         </div>

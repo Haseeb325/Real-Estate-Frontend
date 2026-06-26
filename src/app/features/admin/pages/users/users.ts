@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrimeNgModules } from '../../../../shared/modules/primeng.modules';
 import {
@@ -20,6 +20,15 @@ export class UsersComponent {
   userStore = inject(UserStore);
   users = this.userStore.entities;
   isLoading = this.userStore.isLoading;
+
+  /** Exclude admin accounts from the displayed list and count */
+  nonAdminUsers = computed(() =>
+    this.userStore.entities().filter((u: any) => u.role?.toLowerCase() !== 'admin')
+  );
+  nonAdminCount = computed(() =>
+    this.userStore.totalCount() - this.userStore.entities().filter((u: any) => u.role?.toLowerCase() === 'admin').length
+  );
+
   params = {
     page: 1,
     page_size: 10,
@@ -89,7 +98,7 @@ export class UsersComponent {
   }
 
   loadUsers(forceRefresh = false) {
-    this.userStore.fetchUsers(this.params, forceRefresh);
+    this.userStore.fetchUsers({ ...this.params, exclude_role: 'admin' }, forceRefresh);
   }
 
   onPageChange(page: any) {

@@ -1,8 +1,10 @@
+
 export interface MenuItem {
   label: string;
   icon: string;
-  route: string;
+  route?: string;
   exact?: boolean;
+  action?: () => void;
 }
 
 export interface SidebarSection {
@@ -53,8 +55,9 @@ export const ADMIN_SIDEBAR_DATA: SidebarSection[] = [
       {
         label: 'Logout',
         icon: 'fas fa-sign-out-alt',
-        route: '/auth/logout',
+        action: () => {}, // will be overridden in sidebar component
       },
     ],
   },
 ];
+

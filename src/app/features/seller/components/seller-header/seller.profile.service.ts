@@ -17,6 +17,7 @@ export class SellerProfileService {
   isLoading = signal(false);
   userProfileData: WritableSignal<sellerProfile | null> = signal<sellerProfile | null>(null);
   userDocs: WritableSignal<SellerDocuments | null> = signal<SellerDocuments | null>(null);
+  tempProfileImage: WritableSignal<string | null> = signal<string | null>(null);
 
   getCurrentUser() {
     this.isLoading.set(true);

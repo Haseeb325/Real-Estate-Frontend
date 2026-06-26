@@ -4,6 +4,7 @@ import { SellerProfile } from '../seller-profile/seller-profile';
 import { SellerProfileService } from './seller.profile.service';
 import { Shared } from '../../../../shared/shared.module';
 import { RouterLink } from '@angular/router';
+import { getCloudinaryUrl } from '../../../../shared/utils/common-utils';
 
 @Component({
   selector: 'app-seller-header',
@@ -16,9 +17,12 @@ export class SellerHeader implements OnInit {
 
   sellerProfileService = inject(SellerProfileService);
   user = this.sellerProfileService.user;
+  userProfile = this.sellerProfileService.userProfileData;
+  tempProfileImage = this.sellerProfileService.tempProfileImage;
 
   ngOnInit(): void {
     this.getUser();
+    this.sellerProfileService.fetchProfile().subscribe();
   }
 
   getUser() {
@@ -31,4 +35,6 @@ export class SellerHeader implements OnInit {
       },
     });
   }
+
+  getCloudinary = getCloudinaryUrl;
 }

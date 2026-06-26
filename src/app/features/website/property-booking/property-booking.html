@@ -25,39 +25,30 @@
               <!-- Agent Header -->
               <div class="p-6 border-b border-gray-800 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                  <div
-                    class="w-12 h-12 rounded-full bg-gray-700 flex-shrink-0 border-2 border-gray-800 shadow-inner overflow-hidden flex items-center justify-center"
-                  >
-                    <span class="text-white text-xl font-bold">{{
-                      (selectedProperty()?.user?.username || 'S')[0] | uppercase
-                    }}</span>
+                  <!-- Avatar with presence dot -->
+                  <div class="relative w-12 h-12 flex-shrink-0">
+                    <div class="w-full h-full rounded-full bg-gray-700 border-2 border-gray-800 shadow-inner overflow-hidden flex items-center justify-center">
+                      <span class="text-white text-xl font-bold">{{ (selectedProperty()?.user?.username || 'S')[0] | uppercase }}</span>
+                    </div>
+                    @let sp = globalNotification.getPresence(selectedProperty()?.user?.id);
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-gray-900"
+                      [class.bg-green-500]="sp.isOnline"
+                      [class.bg-gray-500]="!sp.isOnline"></span>
                   </div>
                   <div>
-                    <h3 class="text-gray-100 font-bold">
-                      {{ selectedProperty()?.user?.username || 'Agent' }}
-                    </h3>
-                    <p class="text-gray-500 text-xs">
-                      Listing agent • Typically responds in < 1 hour
-                    </p>
+                    <h3 class="text-gray-100 font-bold">{{ selectedProperty()?.user?.username || 'Agent' }}</h3>
+                    @let sp2 = globalNotification.getPresence(selectedProperty()?.user?.id);
+                    @if (sp2.isOnline) {
+                      <p class="text-green-500 text-xs font-semibold">● Online</p>
+                    } @else if (sp2.lastSeen) {
+                      <p class="text-gray-500 text-xs">Last seen {{ formatLastSeen(sp2.lastSeen) }}</p>
+                    } @else {
+                      <p class="text-gray-500 text-xs">Listing agent</p>
+                    }
                   </div>
                 </div>
 
-                @if (chatService.activeSession()) {
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="w-2.5 h-2.5 rounded-full"
-                      [class.bg-green-500]="chatService.connectionStatus() === 'connected'"
-                      [class.bg-yellow-500]="
-                        chatService.connectionStatus() === 'connecting' ||
-                        chatService.connectionStatus() === 'reconnecting'
-                      "
-                      [class.bg-red-500]="chatService.connectionStatus() === 'disconnected'"
-                    ></div>
-                    <span class="text-gray-400 text-xs font-medium">{{
-                      chatService.connectionStatus() | titlecase
-                    }}</span>
-                  </div>
-                }
+
               </div>
 
               <!-- Message Area / Start Chat Button -->

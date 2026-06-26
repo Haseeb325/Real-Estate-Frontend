@@ -67,7 +67,7 @@ function handle401Error(
     return refreshSubject.pipe(
       filter((val) => val === true),
       take(1),
-      switchMap(() => next(req)),
+      switchMap(() => next(req.clone({ withCredentials: true }))),
     );
   }
 
@@ -78,7 +78,7 @@ function handle401Error(
     switchMap(() => {
       isRefreshing = false;
       refreshSubject.next(true);
-      return next(req);
+      return next(req.clone({ withCredentials: true }));
     }),
     catchError((err) => {
       isRefreshing = false;

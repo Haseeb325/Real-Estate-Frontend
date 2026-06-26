@@ -155,7 +155,7 @@ export const PropertyForm = new FormGroup({
   commercialDetails: new FormGroup({
     commercial_type: new FormControl('commercial', [Validators.required]),
     commercial_subtype: new FormControl('', [Validators.required]),
-    ownership: new FormControl('', [Validators.required]),
+    ownership: new FormControl(''),
     builtup_area: new FormControl(0, [Validators.required]),
     useable_area: new FormControl('', [Validators.required]),
     floor_number: new FormControl('', [Validators.required]),

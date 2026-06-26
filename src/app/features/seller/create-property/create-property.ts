@@ -14,6 +14,7 @@ import { PropertyService } from './property.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { getCloudinaryUrl } from '../../../shared/utils/common-utils';
+import { SellerProfileService } from '../components/seller-header/seller.profile.service';
 
 @Component({
   selector: 'app-create-property',
@@ -30,6 +31,7 @@ import { getCloudinaryUrl } from '../../../shared/utils/common-utils';
 })
 export class CreateProperty {
   propertyService = inject(PropertyService);
+  profileService = inject(SellerProfileService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -38,6 +40,7 @@ export class CreateProperty {
   sale_type: string = 'both';
 
   isEditMode = false;
+  isLoading = false;
   propertyId: string | null = null;
   types = [
     { name: 'House', value: 'house', isActive: true },
@@ -59,6 +62,25 @@ export class CreateProperty {
   }
 
   async ngOnInit() {
+    let isVerified = false;
+    const currentProfile = this.profileService.userProfileData();
+
+    if (currentProfile) {
+      isVerified = currentProfile.is_verified_seller || false;
+    } else {
+      try {
+        const res: any = await firstValueFrom(this.profileService.fetchProfile());
+        isVerified = res?.data?.is_verified_seller || false;
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    }
+
+    if (!isVerified) {
+      this.router.navigate(['/seller/dashboard']);
+      return;
+    }
+
     this.propertyId = this.route.snapshot.paramMap.get('id');
     if (this.propertyId) {
       this.isEditMode = true;
@@ -246,6 +268,8 @@ export class CreateProperty {
 
   async publishListing() {
     console.log('--- Publish Listing Started ---');
+    this.isLoading = true;
+    try {
 
     const typeMapping: { [key: string]: string } = {
       house: 'houseDetails',
@@ -361,6 +385,9 @@ export class CreateProperty {
         payload: formData,
         isFormData: true,
       });
+    }
+    } finally {
+      this.isLoading = false;
     }
   }
 }

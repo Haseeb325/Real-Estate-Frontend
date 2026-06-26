@@ -19,6 +19,7 @@ export interface sellerProfile {
   state?: string;
   country?: string;
   is_verified_seller?: boolean;
+  verification_status?: string;
   created_at?: string;
   updated_at?: string;
   profileImage?: string; // UI property mapping

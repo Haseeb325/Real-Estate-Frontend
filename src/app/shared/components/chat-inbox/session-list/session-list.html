@@ -39,10 +39,15 @@
         (click)="onSelectSession(session)"
       >
         @let other = getOtherUser(session);
-        <div class="session-avatar">
+        @let presence = globalNotification.getPresence(other?.id || other?.username);
+        <div class="session-avatar" style="position: relative;">
           <span class="avatar-initial">
             {{ (other.username || 'U')[0] | uppercase }}
           </span>
+          <span
+            style="position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid #1e293b;"
+            [style.background]="presence.isOnline ? '#22c55e' : '#64748b'"
+          ></span>
         </div>
 
         <div class="session-info">
@@ -54,7 +59,7 @@
           </div>
 
           <p class="session-property">{{ session.property.title || 'Property' }}</p>
-          <p class="session-preview">{{ session.last_message || 'No messages yet' }}</p>
+          <!-- <p class="session-preview">{{ session.last_message || 'No messages yet' }}</p> -->
         </div>
 
         @if (session.unread_count > 0) {

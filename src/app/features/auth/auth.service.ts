@@ -2,6 +2,7 @@ import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { ApiService } from '../../shared/api.service';
 import { URLConfig } from '../../shared/utils/url-config';
 import { ToastService } from '../../core/services/toast.service';
+import { GlobalNotificationService } from '../../core/services/global-notification.service';
 import { catchError, finalize, map, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthStore } from '../../shared/authStore';
@@ -17,6 +18,7 @@ export class AuthService {
     private toastService: ToastService,
     private authStore: AuthStore,
     public router: Router,
+    private globalNotification: GlobalNotificationService,
   ) {}
   private _loading = signal(false);
   readonly isLoading = this._loading.asReadonly();
@@ -213,6 +215,8 @@ export class AuthService {
         this.tempToken.set(null);
         this.authStore.setToken(response.data.access);
         this.authStore.setUser(response.data.user);
+        // Start global notification WS so user gets beeps on any screen
+        this.globalNotification.connect();
         if (response.data.user.role === 'buyer') {
           this.router.navigate(['/landing']);
         } else if (response.data.user.role === 'seller') {
@@ -248,6 +252,7 @@ export class AuthService {
 
   logoutUser() {
     this.apiService.post(URLConfig.logout, {}, { withCredentials: true }).subscribe(() => {
+      this.globalNotification.disconnect();
       this.clearAuthState();
       this.authStore?.clearAll();
       this.router.navigate(['/sign-in']);

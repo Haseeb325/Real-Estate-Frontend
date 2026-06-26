@@ -1,4 +1,4 @@
-import { Component, computed, inject, Signal } from '@angular/core';
+import { Component, computed, inject, Signal, signal, effect } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebSiteService } from '../website.service';
@@ -26,6 +26,24 @@ export class PropertyDetail {
   getCloudinaryUrl = getCloudinaryUrl;
   purchaseType = 'Buy';
 
+  // State for image gallery
+  activeImage = signal<string | null>(null);
+  carouselImages = signal<string[]>([]);
+
+  // State for auth required modal
+  showAuthDialog = signal(false);
+
+  constructor() {
+    effect(() => {
+      const prop = this.property();
+      if (prop) {
+        this.activeImage.set(prop.hero_image);
+        const otherImgs = prop.images?.map((img: any) => img.image) || [];
+        this.carouselImages.set(otherImgs);
+      }
+    }, { allowSignalWrites: true });
+  }
+
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     console.log(id);
@@ -40,21 +58,32 @@ export class PropertyDetail {
   }
 
   router = inject(Router);
-  // checkUser() {
-  //   if (
-  //     !this.authStore.user() ||
-  //     !this.authStore.isAuthenticated() ||
-  //     this.authStore.user()?.role == 'buyer'
-  //   ) {
-  //     this.router.navigate(['/sign-in']);
-  //   }
-  //   this.router.navigate([
-  //     '/property-booking',
-  //     this.property()?.property_type,
-  //     this.purchaseType,
-  //     this.property()?.id,
-  //   ]);
-  // }
+
+  swapImage(index: number) {
+    const currentActive = this.activeImage();
+    const currentCarousel = [...this.carouselImages()];
+    const clickedImage = currentCarousel[index];
+
+    if (currentActive && clickedImage) {
+      currentCarousel[index] = currentActive;
+      this.activeImage.set(clickedImage);
+      this.carouselImages.set(currentCarousel);
+    }
+  }
+
+  proceedToBooking() {
+    if (!this.authStore.isAuthenticated()) {
+      this.showAuthDialog.set(true);
+      return;
+    }
+
+    this.router.navigate([
+      '/property-booking',
+      this.property()?.property_type,
+      this.purchaseType,
+      this.property()?.id,
+    ]);
+  }
 
   onViewMap() {
     const property = this.property();

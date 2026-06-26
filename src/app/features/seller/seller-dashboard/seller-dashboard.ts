@@ -33,6 +33,9 @@ export class SellerDashboard {
   stats: WritableSignal<any> = signal(null);
   selectedPropertyId = signal<string | null>(null);
   showAvailabilityPopup = signal(false);
+  showNotVerifiedPopup = signal(false);
+  userProfileService = inject(SellerProfileService);
+  userData = this.userProfileService.userProfileData;
 
   activeCount = computed(() => this.stats()?.data.filter((p: any) => p.is_verified).length || 0);
   totalCount = computed(() => this.stats()?.count || 0);
@@ -161,7 +164,7 @@ export class SellerDashboard {
       },
       {
         ...editButton,
-        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
+        disabled: (row) => row.status == 'sold' || row.status == 'reserved',
         command: () => {
           this.router.navigate(['/seller/edit-property', row.id]);
         },
@@ -170,7 +173,7 @@ export class SellerDashboard {
         icon: 'pi pi-calendar',
         label: 'Set Availability',
         class: 'text-blue-500',
-        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
+        disabled: (row) => row.status == 'sold' || row.status == 'reserved',
         command: () => {
           this.selectedPropertyId.set(row.id);
           this.showAvailabilityPopup.set(true);
@@ -178,7 +181,7 @@ export class SellerDashboard {
       },
       {
         ...deleteButton,
-        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
+        disabled: (row) => row.status == 'sold' || row.status == 'reserved',
         command: async () => {
           this.dashboardService.loading.set(true);
           await firstValueFrom(this.apiService.delete(URLConfig.deleteSellerProperty(row.id)))
@@ -196,7 +199,7 @@ export class SellerDashboard {
       },
       {
         ...this.checkIfPauseOrActive(row),
-        disabled:(row)=> row.status == 'sold' || row.status == 'reserved',
+        disabled: (row) => row.status == 'sold' || row.status == 'reserved',
         visible: (r: any) => row.status === 'active' || row.status === 'pause',
         command: () => {
           if (row.status === 'pause') {
@@ -214,6 +217,15 @@ export class SellerDashboard {
   ngOnInit() {
     this.loadStat();
     this.loadProperties(true);
+  }
+
+  handleCreateListingClick() {
+    const profile = this.userData();
+    if (profile?.is_verified_seller) {
+      this.router.navigate(['/seller/create-listing']);
+    } else {
+      this.showNotVerifiedPopup.set(true);
+    }
   }
 
   loadProperties(forceRefresh = false) {
@@ -283,3 +295,4 @@ export class SellerDashboard {
     return { visible: (r: any) => false };
   }
 }
+import { SellerProfileService } from '../components/seller-header/seller.profile.service';

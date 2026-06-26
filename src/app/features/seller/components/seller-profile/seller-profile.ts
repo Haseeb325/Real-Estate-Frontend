@@ -5,17 +5,19 @@ import { sellerDocsForm, sellerProfileForm } from '../../../../shared/forms.conf
 import { FormGroup } from '@angular/forms';
 import { getCloudinaryUrl } from '../../../../shared/utils/common-utils';
 import { PopupBackdrop } from '../../../../components/popup-backdrop/popup-backdrop';
-import { ToastModule } from 'primeng/toast';
+
 import { ChangePassword } from '../../../../components/change-password/change-password';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-seller-profile',
-  imports: [Shared, PopupBackdrop, ToastModule, ChangePassword],
+  imports: [Shared, PopupBackdrop, ChangePassword],
   templateUrl: './seller-profile.html',
   styleUrl: './seller-profile.scss',
 })
 export class SellerProfile implements OnInit {
   profileService = inject(SellerProfileService);
+  authService = inject(AuthService);
 
   user = this.profileService.user;
   userProfile = this.profileService.userProfileData;
@@ -93,6 +95,8 @@ export class SellerProfile implements OnInit {
         }
       });
       payload = formData;
+      // Set temporary preview for header
+      this.profileService.tempProfileImage.set(this.imagePreview());
     } else {
       // If it's not a File, we send JSON. We might want to remove the profile_image
       // if it's just the URL string to avoid issues, depending on backend.
@@ -104,9 +108,11 @@ export class SellerProfile implements OnInit {
       next: () => {
         this.isEditModalOpen.set(false);
         this.imagePreview.set(null);
+        this.fetchProfileData();
       },
       error: (err) => {
         console.error('Profile update failed', err);
+        this.profileService.tempProfileImage.set(null);
       },
     });
   }

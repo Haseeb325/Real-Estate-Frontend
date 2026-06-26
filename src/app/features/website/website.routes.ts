@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
-import { AuthGuard, RoleGuard } from '../../core/guards/auth.guard';
+import { AuthGuard, RoleGuard, PublicGuard } from '../../core/guards/auth.guard';
 
 export const websiteRoutes: Routes = [
   {
     path: '',
     loadComponent: () => import('./website').then((m) => m.Website),
+    canActivate: [PublicGuard],
     children: [
       {
         path: '',

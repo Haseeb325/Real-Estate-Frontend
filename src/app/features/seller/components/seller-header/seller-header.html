@@ -1,19 +1,25 @@
 <header class="bg-gray-900 border-b border-gray-800 px-4 md:px-8 py-4">
   <div class="max-w-7xl mx-auto flex items-center justify-between">
     <!-- Logo -->
-    <div class="flex items-center gap-2">
-     <div class="mb-4 text-center justify-center items-center gap-2 flex flex-col">
-      <!-- <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
+    <div class="flex cursor-pointer items-center gap-2" routerLink="/seller/dashboard">
+      <div class="mb-4 text-center justify-center items-center gap-2 flex flex-col">
+        <!-- <div class="mx-auto w-14 h-14 bg-pink-400/20 rounded-full flex items-center justify-center mb-4">
         <span class="text-pink-400 font-bold text-lg">P</span> -->
-                <img class="h-16 w-16 justify-center items-center" src="assets/images/propify-removebg-preview.png" alt="">
-     </div>
+        <img
+          class="h-16 w-16 justify-center items-center"
+          src="assets/images/propify-removebg-preview.png"
+          alt=""
+        />
+      </div>
       <!-- <span class="text-gray-500 text-xs font-semibold tracking-widest hidden sm:inline"
         >PROPIFY</span -->
       >
     </div>
 
     <!-- Navigation -->
-    <nav class="flex items-center gap-2 md:gap-4 flex-wrap bg-gray-950/50 p-1.5 rounded-2xl border border-gray-800/50 backdrop-blur-md">
+    <nav
+      class="flex items-center gap-2 md:gap-4 flex-wrap bg-gray-950/50 p-1.5 rounded-2xl border border-gray-800/50 backdrop-blur-md"
+    >
       <a
         [routerLink]="['/seller/dashboard']"
         routerLinkActive="bg-orange-600 text-white shadow-xl shadow-orange-900/30"
@@ -53,8 +59,32 @@
       </div>
       <div
         (click)="showProfile = true"
-        class="cursor-pointer w-10 h-10 rounded-full bg-rose-300 flex-shrink-0"
-      ></div>
+        class="cursor-pointer w-10 h-10 rounded-full bg-gray-700 flex-shrink-0 overflow-hidden"
+      >
+        @if (tempProfileImage()) {
+          <img
+            [src]="tempProfileImage()"
+            alt="Profile"
+            class="w-full h-full object-cover"
+          />
+        } @else if (userProfile()?.profileImage) {
+          <img
+            [src]="getCloudinary(userProfile()?.profileImage)"
+            alt="Profile"
+            class="w-full h-full object-cover"
+          />
+        } @else {
+          <div class="w-full h-full flex items-center justify-center text-gray-400">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </div>
+        }
+      </div>
     </div>
   </div>
 </header>

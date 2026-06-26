@@ -3,10 +3,12 @@ import { Subscription, firstValueFrom } from 'rxjs';
 import { ApiService } from '../../shared/api.service';
 import { AuthStore } from '../../shared/authStore';
 import { ToastService } from './toast.service';
+import { NotificationService } from './notification.service';
 import { WebSocketService } from './websocket.service';
 import {
   ChatSession,
   ChatMessage,
+  ChatUser,
   WsIncomingMessage,
   WsOutgoingMessage,
 } from '../models/chat.models';
@@ -30,6 +32,7 @@ export class ChatService {
   private ws = inject(WebSocketService);
   private authStore = inject(AuthStore);
   private toast = inject(ToastService);
+  private notificationService = inject(NotificationService);
 
   // ── Signals (Components read these) ──
   readonly sessions = signal<ChatSession[]>([]);
@@ -51,9 +54,23 @@ export class ChatService {
     if (!session || !currentUsername) return null;
 
     // If I am the buyer, return the seller. If I am the seller, return the buyer.
-    return session.buyer.username.toLowerCase() === currentUsername.toLowerCase()
-      ? session.seller
-      : session.buyer;
+    const isBuyer = session.buyer.username.toLowerCase() === currentUsername.toLowerCase();
+    const other = isBuyer ? { ...session.seller } : { ...session.buyer };
+
+    // If the API only returned a username string (id is 0), try to infer the real ID from messages
+    if (!other.id || other.id === 0) {
+      const msgs = this.messages();
+      const msgFromOther = msgs.find(
+        (m) => m.sender_username?.toLowerCase() === other.username.toLowerCase(),
+      );
+      if (msgFromOther && msgFromOther.sender) {
+        other.id = typeof msgFromOther.sender === 'object' 
+          ? (msgFromOther.sender as any).id 
+          : msgFromOther.sender;
+      }
+    }
+
+    return other;
   });
 
   // ── Internal ──
@@ -67,14 +84,27 @@ export class ChatService {
   // ════════════════════════════════════════════
 
   private normalizeSession(raw: any): ChatSession {
+    const normUser = (u: any): ChatUser => {
+      if (!u) return { id: 0, username: 'Unknown' };
+      if (typeof u === 'string') return { id: 0, username: u };
+      return {
+        id: u.id ?? u.user_id ?? 0,
+        username: u.username ?? '',
+        full_name: u.full_name ?? u.name ?? '',
+        profile_image: u.profile_image ?? null,
+      };
+    };
+
     return {
       session_id: raw.id || raw.session_id,
-      buyer: typeof raw.buyer === 'string' ? { id: 0, username: raw.buyer } : raw.buyer,
-      seller: typeof raw.seller === 'string' ? { id: 0, username: raw.seller } : raw.seller,
+      buyer: normUser(raw.buyer),
+      seller: normUser(raw.seller),
       property:
         typeof raw.property === 'string'
-          ? { id: 0, title: raw.property_title || 'Property' }
-          : raw.property,
+          ? { id: raw.property_id || raw.propertyId || 0, title: raw.property_title || raw.property || 'Property' }
+          : typeof raw.property === 'number'
+            ? { id: raw.property, title: raw.property_title || `Property ${raw.property}` }
+            : raw.property || { id: raw.property_id || 0, title: raw.property_title || 'Property' },
       last_message: raw.last_message || null,
       last_message_time: raw.updated_at || raw.last_message_time || null,
       unread_count: raw.unread_count || 0,
@@ -166,7 +196,33 @@ export class ChatService {
   }
 
   // ════════════════════════════════════════════
+  // REST: Mark Messages as Read
+  // ════════════════════════════════════════════
+
+  async markMessagesAsRead(sessionId: string, messageIds: string[]): Promise<void> {
+    if (!messageIds || messageIds.length === 0) return;
+
+    try {
+      const response: any = await firstValueFrom(
+        this.api.patch(`${this.baseUrl}sessions/${sessionId}/messages/read/`, {
+          message_ids: messageIds,
+        }),
+      );
+
+      if (response.status === 200) {
+        // Update local state to reflect read status
+        this.messages.update((prev) =>
+          prev.map((msg) => (messageIds.includes(msg.id as any) ? { ...msg, is_read: true } : msg)),
+        );
+      }
+    } catch (error: any) {
+      console.error('[ChatService] Failed to mark messages as read:', error);
+    }
+  }
+
+  // ════════════════════════════════════════════
   // Switch Active Session (Core Orchestration)
+
   // ════════════════════════════════════════════
 
   selectSession(session: ChatSession): void {
@@ -210,7 +266,17 @@ export class ChatService {
   // Handle Incoming WebSocket Event
   // ════════════════════════════════════════════
 
-  private onWsMessage(event: WsIncomingMessage): void {
+  private onWsMessage(event: any): void {
+    if (event.type === 'messages_read') {
+      const readIds = event.message_ids as string[];
+      if (readIds && readIds.length > 0) {
+        this.messages.update((prev) =>
+          prev.map((msg) => (readIds.includes(msg.id as any) ? { ...msg, is_read: true } : msg)),
+        );
+      }
+      return;
+    }
+
     // Convert WS event → ChatMessage shape
     const newMessage: ChatMessage = {
       id: event.message_id,
@@ -224,6 +290,22 @@ export class ChatService {
 
     // Append to messages signal (triggers UI re-render)
     this.messages.update((prev) => [...prev, newMessage]);
+
+    // Play notification sound if message is from the OTHER person
+    const currentId = this.authStore.user()?.id?.toString();
+    const currentUsername = this.authStore.user()?.username?.toLowerCase();
+    const senderId = event.sender_id?.toString();
+    const senderUsername = event.sender_username?.toLowerCase();
+    const isFromOther =
+      (currentId && senderId && currentId !== senderId) ||
+      (currentUsername && senderUsername && currentUsername !== senderUsername);
+
+    if (isFromOther) {
+      this.notificationService.notify(
+        event.sender_username || 'Someone',
+        event.message || '(new message)',
+      );
+    }
 
     // Update last_message in session list (for inbox preview)
     this.sessions.update((sessions) =>
