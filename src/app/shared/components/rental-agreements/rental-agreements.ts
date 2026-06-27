@@ -191,4 +191,33 @@ export class RentalAgreements {
         return 'bg-gray-500/20 text-gray-400';
     }
   }
+
+  // Check if a payment is the next one to be paid in sequence
+  isNextPaymentToPay(payment: MonthlyRentPayment, index: number): boolean {
+    const payments = this.selectedAgreement()?.monthly_payments || [];
+    
+    // Find the first unpaid payment
+    let firstUnpaidIndex = -1;
+    for (let i = 0; i < payments.length; i++) {
+      if (payments[i].status !== 'paid') {
+        firstUnpaidIndex = i;
+        break;
+      }
+    }
+    
+    // This payment is the next to pay if it's the first unpaid one
+    return index === firstUnpaidIndex && payment.status === 'pending';
+  }
+
+  // Check if a payment should be locked (not the next in sequence)
+  isPaymentLocked(payment: MonthlyRentPayment, index: number): boolean {
+    // If already paid, not locked (shows receipt)
+    if (payment.status === 'paid') return false;
+    
+    // If it's the next payment to pay, not locked
+    if (this.isNextPaymentToPay(payment, index)) return false;
+    
+    // Otherwise, it's locked
+    return true;
+  }
 }
