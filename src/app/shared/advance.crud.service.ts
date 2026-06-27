@@ -67,13 +67,17 @@ export abstract class AdvanceCrudService<TModel, TDto = any> {
 
   // reuseable request wrapper
 
-  protected async request<R>(fn: () => Promise<R>, useGlobalLoading = false) {
+  protected async request<R>(fn: () => Promise<R>, useGlobalLoading = false, silentErrors: number[] = []) {
     if (useGlobalLoading) this.globalLoadingServie.start();
     this._localLoading.set(true);
     try {
       return await fn();
     } catch (err: any) {
-      this.toastService.error(err.error.message || 'Something went wrong');
+      const statusCode = err?.status || err?.error?.status;
+      // Only show toast if status code is not in silent errors list
+      if (!silentErrors.includes(statusCode)) {
+        this.toastService.error(err.error.message || 'Something went wrong');
+      }
       throw err;
     } finally {
       if (useGlobalLoading) this.globalLoadingServie.stop();
@@ -83,7 +87,7 @@ export abstract class AdvanceCrudService<TModel, TDto = any> {
 
   // Fetch
 
-  async fetch(url: string, params: any = {}, forceRefresh = false, useGlobalLoading = false) {
+  async fetch(url: string, params: any = {}, forceRefresh = false, useGlobalLoading = false, silentErrors: number[] = []) {
     if (!forceRefresh && this.isCacheValid()) return;
 
     return this.request(async () => {
@@ -115,7 +119,7 @@ export abstract class AdvanceCrudService<TModel, TDto = any> {
         this.sortItems(this._defaultSortFn);
       }
       return items;
-    }, useGlobalLoading);
+    }, useGlobalLoading, silentErrors);
   }
 
   //  Fetch By ID

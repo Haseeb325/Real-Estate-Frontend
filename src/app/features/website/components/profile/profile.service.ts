@@ -23,7 +23,7 @@ constructor() {
   }
 
 async getProfile(){
-  return await this.fetch(URLConfig.buyerProfile)
+  return await this.fetch(URLConfig.buyerProfile, {}, false, false, [404]);
    }
 
 
