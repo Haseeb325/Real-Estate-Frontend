@@ -22,7 +22,7 @@ export class ResetPassword {
     this.authService.resetPassword(this.resetPasswordForm.value).subscribe({
       next:(res)=>{
         console.log(res)
-        this.authService.router.navigate(['/forgot-password'])
+        // this.authService.router.navigate(['/forgot-password'])
       },
       error:(err)=>{
         console.log(err)
