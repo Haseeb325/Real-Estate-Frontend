@@ -32,6 +32,9 @@ export class Landing implements OnInit, OnDestroy {
   maxPrice = signal<number>(this.filterState.filters()['max_price'] ?? 100000000000);
   purchaseType = signal<string>(this.filterState.filters()['sale_type'] || '');
 
+  // Mobile filter toggle state
+  mobileFilterOpen = signal(false);
+
   // Computed for unique bedroom options
   uniqueBedrooms = computed(() => {
     const properties = this.properties();
@@ -97,6 +100,10 @@ export class Landing implements OnInit, OnDestroy {
       this.purchaseType.set('')
 
     }
+
+  toggleMobileFilter() {
+    this.mobileFilterOpen.update(open => !open);
+  }
 
   // Helper method to get properties filtered by current type
   private getFilteredPropertiesByType(): Property[] {

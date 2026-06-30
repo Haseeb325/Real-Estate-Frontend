@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, input } from '@angular/core';
 import { Shared } from '../../../../shared/shared.module';
 import { SellerProfileService } from '../seller-header/seller.profile.service';
 import { sellerDocsForm, sellerProfileForm } from '../../../../shared/forms.config';
@@ -18,6 +18,8 @@ import { AuthService } from '../../../auth/auth.service';
 export class SellerProfile implements OnInit {
   profileService = inject(SellerProfileService);
   authService = inject(AuthService);
+
+  embedded = input(false);
 
   user = this.profileService.user;
   userProfile = this.profileService.userProfileData;

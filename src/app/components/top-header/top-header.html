@@ -90,21 +90,58 @@
     id="mobile-menu"
     class="hidden absolute top-full left-0 w-full bg-[#0f172a] border-b border-slate-800 p-4 flex-col gap-4 shadow-xl md:hidden"
   >
-    <button
-      class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
-    >
-      Home
-    </button>
-    <button
-      class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
-    >
-      Sign in
-    </button>
-    <button
-      class="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition"
-    >
-      Register
-    </button>
+    @if (!isAuthenticated()) {
+      <button
+        routerLink="/"
+        (click)="closeMobileMenu()"
+        class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
+      >
+        Home
+      </button>
+      <button
+        routerLink="/sign-in"
+        (click)="closeMobileMenu()"
+        class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
+      >
+        Sign in
+      </button>
+      <button
+        routerLink="/reg-step-1"
+        (click)="closeMobileMenu()"
+        class="w-full text-center px-4 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition"
+      >
+        Register
+      </button>
+    }
+
+    @if (isAuthenticated()) {
+      <button
+        routerLink="/"
+        (click)="closeMobileMenu()"
+        class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
+      >
+        Home
+      </button>
+      <button
+        [routerLink]="['/dashboard']"
+        (click)="closeMobileMenu()"
+        class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
+      >
+        Dashboard
+      </button>
+      <button
+        (click)="openProfile = true; closeMobileMenu()"
+        class="w-full text-left px-4 py-3 border border-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition"
+      >
+        Profile
+      </button>
+      <button
+        (click)="logout(); closeMobileMenu()"
+        class="w-full text-center px-4 py-3 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition"
+      >
+        Logout
+      </button>
+    }
   </div>
 </nav>
 

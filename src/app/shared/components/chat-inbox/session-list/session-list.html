@@ -16,7 +16,12 @@
         clip-rule="evenodd"
       />
     </svg>
-    <input type="text" placeholder="Search conversations..." class="search-input" />
+    <input 
+      type="text" 
+      placeholder="Search conversations..." 
+      class="search-input" 
+      (input)="onSearchChange($event)"
+    />
   </div>
 </div>
 
@@ -27,12 +32,12 @@
       <div class="loading-spinner"></div>
       <p>Loading conversations...</p>
     </div>
-  } @else if (sessions().length === 0) {
+  } @else if (filteredSessions().length === 0) {
     <div class="session-empty">
-      <p>No conversations yet</p>
+      <p>No conversations found</p>
     </div>
   } @else {
-    @for (session of sessions(); track session.session_id) {
+    @for (session of filteredSessions(); track session.session_id) {
       <div
         class="session-item"
         [class.active]="activeSessionId() === session.session_id"
@@ -41,9 +46,13 @@
         @let other = getOtherUser(session);
         @let presence = globalNotification.getPresence(other?.id || other?.username);
         <div class="session-avatar" style="position: relative;">
-          <span class="avatar-initial">
-            {{ (other.username || 'U')[0] | uppercase }}
-          </span>
+          @if (other.profile_image) {
+            <img [src]="getCloudinary(other.profile_image)" alt="{{ other.username }}" class="w-full h-full object-cover rounded-full" />
+          } @else {
+            <span class="avatar-initial">
+              {{ (other.username || 'U')[0] | uppercase }}
+            </span>
+          }
           <span
             style="position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid #1e293b;"
             [style.background]="presence.isOnline ? '#22c55e' : '#64748b'"

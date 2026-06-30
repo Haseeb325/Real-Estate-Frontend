@@ -127,11 +127,85 @@ export class ChatService {
       }
 
       const normalizedSessions = response.data.map((raw: any) => this.normalizeSession(raw));
+      
+      // Fetch profile images for users who don't have them
+      await this.enrichSessionsWithProfileImages(normalizedSessions);
+      
       this.sessions.set(normalizedSessions);
+
+      // Auto-select first session with unread messages, or the most recent one
+      if (normalizedSessions.length > 0 && !this.activeSession()) {
+        const unreadSession = normalizedSessions.find((s:any) => s.unread_count > 0);
+        const sessionToSelect = unreadSession || normalizedSessions[0];
+        this.selectSession(sessionToSelect);
+      }
     } catch (error: any) {
       this.toast.error(error?.error?.message || 'Failed to load sessions');
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  private async enrichSessionsWithProfileImages(sessions: ChatSession[]): Promise<void> {
+    const userIds = new Set<number>();
+    
+    // Collect unique user IDs that need profile images
+    sessions.forEach(session => {
+      if (!session.buyer.profile_image && session.buyer.id > 0) {
+        userIds.add(session.buyer.id);
+      }
+      if (!session.seller.profile_image && session.seller.id > 0) {
+        userIds.add(session.seller.id);
+      }
+    });
+
+    console.log('User IDs needing profile images:', Array.from(userIds));
+
+    // Fetch profile images for each user
+    for (const userId of userIds) {
+      try {
+        // Try different possible endpoints
+        const endpoints = [
+          `users/${userId}/`,
+          `users/${userId}/profile/`,
+          `profile/user/${userId}/`,
+        ];
+
+        let profileData = null;
+        for (const endpoint of endpoints) {
+          try {
+            const response: any = await firstValueFrom(this.api.get(endpoint));
+            console.log(`Response from ${endpoint}:`, response);
+            if (response.status === 200) {
+              profileData = response.data;
+              break;
+            }
+          } catch (e) {
+            console.log(`Endpoint ${endpoint} failed:`, e);
+            continue;
+          }
+        }
+
+        if (profileData) {
+          const profileImage = profileData.profile_image || profileData.profileImage;
+          console.log(`Found profile image for user ${userId}:`, profileImage);
+          
+          if (profileImage) {
+            // Update sessions with the fetched profile image
+            sessions.forEach(session => {
+              if (session.buyer.id === userId) {
+                session.buyer.profile_image = profileImage;
+              }
+              if (session.seller.id === userId) {
+                session.seller.profile_image = profileImage;
+              }
+            });
+          }
+        }
+      } catch (error) {
+        // Silently fail if profile fetch fails - user will just show initial
+        console.warn(`Failed to fetch profile for user ${userId}`, error);
+      }
     }
   }
 
@@ -296,7 +370,7 @@ export class ChatService {
     const currentUsername = this.authStore.user()?.username?.toLowerCase();
     const senderId = event.sender_id?.toString();
     const senderUsername = event.sender_username?.toLowerCase();
-    const isFromOther =
+    const isFromOther =               
       (currentId && senderId && currentId !== senderId) ||
       (currentUsername && senderUsername && currentUsername !== senderUsername);
 

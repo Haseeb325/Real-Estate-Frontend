@@ -47,11 +47,11 @@ export const ADMIN_SIDEBAR_DATA: SidebarSection[] = [
   {
     section: 'Account',
     items: [
-      {
-        label: 'Settings',
-        icon: 'fas fa-cog',
-        route: '/admin/settings',
-      },
+      // {
+      //   label: 'Settings',
+      //   icon: 'fas fa-cog',
+      //   route: '/admin/settings',
+      // },
       {
         label: 'Logout',
         icon: 'fas fa-sign-out-alt',

@@ -14,6 +14,7 @@ import { getCloudinaryUrl } from '../../../../shared/utils/common-utils';
 })
 export class SellerHeader implements OnInit {
   showProfile = false;
+  mobileMenuOpen = false;
 
   sellerProfileService = inject(SellerProfileService);
   user = this.sellerProfileService.user;
@@ -34,6 +35,14 @@ export class SellerHeader implements OnInit {
         console.log('err', err);
       },
     });
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
   }
 
   getCloudinary = getCloudinaryUrl;

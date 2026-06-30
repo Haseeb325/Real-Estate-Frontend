@@ -31,6 +31,28 @@ export class TopHeader   {
     if(this.isAuthenticated()){
       this.profileService.getProfile()
     }
+    // Setup mobile menu toggle
+    this.setupMobileMenu();
+  }
+
+  setupMobileMenu() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (menuBtn && mobileMenu) {
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        mobileMenu.classList.toggle('flex');
+      });
+    }
+  }
+
+  closeMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) {
+      mobileMenu.classList.add('hidden');
+      mobileMenu.classList.remove('flex');
+    }
   }
   logout(){
 this.authService.logoutUser()
